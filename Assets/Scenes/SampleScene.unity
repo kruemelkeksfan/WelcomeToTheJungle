@@ -222,7 +222,7 @@ MonoBehaviour:
   width: 20
   height: 20
   terrainSmoothness: 200
-  terrainSteepness: 60
+  terrainSteepness: 40
   chunkPrefab: {fileID: 2411137914868565745, guid: aaff4288984867b4e9c30bff26646081,
     type: 3}
 --- !u!4 &563037452
