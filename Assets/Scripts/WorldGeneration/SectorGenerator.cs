@@ -6,6 +6,7 @@ public class SectorGenerator : MonoBehaviour
 {
     [SerializeField] private int width = 100;
     [SerializeField] private int height = 100;
+    [SerializeField] private float chunkSize = 1.0f;
     [Tooltip("Determines the Size of Terrain Features, low Values break Unitys PerlinNoise")]
     [SerializeField] private float terrainSmoothness = 10.0f;
     [Tooltip("Determines the Height Difference between Hills and Valleys")]
@@ -15,10 +16,7 @@ public class SectorGenerator : MonoBehaviour
 
     private void Start()
     {
-        GameObject chunkProbe = GameObject.Instantiate(chunkPrefab);
-        float chunkSize = chunkProbe.GetComponent<Collider>().bounds.size.x;
-        GameObject.Destroy(chunkProbe, 0.0f);
-
+        // TODO: Randomness by offsetting x and y in a random Direction (see PerlinNoise Doc)
         for(int y = 0; y < height; ++y)
 		{
             for(int x = 0; x < width; ++x)
