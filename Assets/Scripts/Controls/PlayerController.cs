@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
 	//[SerializeField] private GrapplingHook grapplingHook = null;
 	[Tooltip("A Collider at the Position of the Players Feet, used to check whether the Player is grounded")]
 	[SerializeField] private Collider feet = null;
+	[SerializeField] private Animator standAnimator = null;
+	[SerializeField] private Animator walkAnimator = null;
 	private new Rigidbody rigidbody = null;
 	private Rigidbody parentRigidbody = null;
 	private List<ContactPoint> contactList = null;
@@ -158,6 +160,21 @@ public class PlayerController : MonoBehaviour
 		//Apply Movement
 		rigidbody.AddForce(movementVelocityChange + tractionVelocityChange, ForceMode.VelocityChange);
 
+		// Walking Animation
+		if(standAnimator != null && walkAnimator != null)
+		{
+			if(direction != Vector3.zero)
+			{
+				standAnimator.StopAnimation();
+				walkAnimator.StartAnimation();
+			}
+			else
+			{
+				walkAnimator.StopAnimation();
+				standAnimator.StartAnimation();
+			}
+		}
+
 		// Step forward to finish automatic Step up from previous Frame
 		if(stepTime > 0.0f && Time.time >= stepTime)
 		{
@@ -166,7 +183,7 @@ public class PlayerController : MonoBehaviour
 		}
 		if(stepTime <= 0 && stepTime > -stepDelay)
 		{
-			stepTime -= Time.deltaTime;					// Measure Time since last Step
+			stepTime -= Time.deltaTime;                 // Measure Time since last Step
 		}
 
 		// Jumping
@@ -202,7 +219,7 @@ public class PlayerController : MonoBehaviour
 	// Only get grounded, when you stay longer than 1 Frame on a Collider
 	private void OnCollisionStay(Collision collision)
 	{
-		if(Input.GetAxis("Horizontal") != 0.0f ||  Input.GetAxis("Vertical") != 0.0f)
+		if(Input.GetAxis("Horizontal") != 0.0f || Input.GetAxis("Vertical") != 0.0f)
 		{
 			stepUp(collision);
 		}
@@ -247,7 +264,7 @@ public class PlayerController : MonoBehaviour
 
 	private void stepUp(Collision collision)
 	{
-		if(stepTime < -stepDelay)																																		// Previous Step must be complete
+		if(stepTime < -stepDelay)                                                                                                                                       // Previous Step must be complete
 		{
 			int contactCount = collision.GetContacts(contactList);
 			for(int i = 0; i < contactCount; ++i)
@@ -257,7 +274,7 @@ public class PlayerController : MonoBehaviour
 					Vector3 stepStart = new Vector3(transform.position.x, (transform.position.y + feetDisplacement + maximumStepHeight), transform.position.z);
 					Vector3 stepTarget = new Vector3(contactList[i].point.x, (transform.position.y + feetDisplacement + maximumStepHeight), contactList[i].point.z);
 					Vector3 stepDirection = stepTarget - stepStart;
-					if(rigidbody.velocity == Vector3.zero || Vector3.Angle(rigidbody.velocity, stepDirection) <= 90.0f)													// Is the Step actually in the Way of the Player?
+					if(rigidbody.velocity == Vector3.zero || Vector3.Angle(rigidbody.velocity, stepDirection) <= 90.0f)                                                 // Is the Step actually in the Way of the Player?
 					{
 						if(!Physics.Raycast(stepStart, stepDirection, stepDirection.magnitude + 0.02f))                                                                 // Is the Path for the Step clear and the Step itself not too high?
 						{
@@ -266,7 +283,7 @@ public class PlayerController : MonoBehaviour
 							{
 								float stepHeight = hit.point.y - (transform.position.y + feetDisplacement);
 								rigidbody.velocity = ((Vector3.up * (2.0f + (stepHeight * 4.0f))) + (-stepDirection.normalized));                                       // Reset Velocity and apply Height dependent upward Force
-								stepTime = Time.time + stepHeight * 0.4f;																								// Height dependent Delay for stepping forward
+								stepTime = Time.time + stepHeight * 0.4f;                                                                                               // Height dependent Delay for stepping forward
 								stepForward = stepDirection.normalized * (2.0f + (stepHeight * 2.0f));                                                                  // Height dependent Step forward Direction
 							}
 						}

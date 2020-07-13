@@ -20,17 +20,18 @@ public class Animatable : MonoBehaviour
 			passedtime += Time.deltaTime;
 
 			float progress = passedtime / time;
-			transform.position = Vector3.Lerp(startposition, targetposition, progress);
-			transform.rotation = Quaternion.Slerp(startrotation, targetrotation, progress);
+			transform.localPosition = Vector3.Lerp(startposition, targetposition, progress);
+			transform.localRotation = Quaternion.Slerp(startrotation, targetrotation, progress);
 		}
 	}
 
-	public void Move(int target, float time)
+	public void move(int target, float time)
 	{
+		//Debug.Log("Start: " + Time.time);
 		if(target >= 0 && target < positions.Length && target < rotations.Length)
 		{
-			startposition = transform.position;
-			startrotation = transform.rotation;
+			startposition = transform.localPosition;
+			startrotation = transform.localRotation;
 			targetposition = positions[target];
 			targetrotation = Quaternion.Euler(rotations[target]);
 
@@ -41,5 +42,11 @@ public class Animatable : MonoBehaviour
 		{
 			Debug.LogError("Invalid Target Position " + target + " for " + name + "!");
 		}
+	}
+
+	public void stopMovement()
+	{
+		//Debug.Log("Stop: " + Time.time);
+		this.time = 0.0f;
 	}
 }

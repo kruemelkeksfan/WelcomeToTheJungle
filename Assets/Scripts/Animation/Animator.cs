@@ -7,10 +7,10 @@ public class Animator : MonoBehaviour
 	[SerializeField] private Animatable[] animatables = null;
 	[SerializeField] private new string[] animation = null;
 	[SerializeField] private bool loop = false;
-	private bool running = false;
 	private int lineIndex = 0;
 	private float time = 0.0f;
 	private float passedTime = 0.0f;
+	private bool running = false;
 
 	// Animation Format:
 	// [0] start <time>
@@ -81,7 +81,7 @@ public class Animator : MonoBehaviour
 						int position = 0;
 						if(int.TryParse(argument, out position))
 						{
-							animatables[partid].Move(position, time);
+							animatables[partid].move(position, time);
 						}
 						else
 						{
@@ -101,13 +101,29 @@ public class Animator : MonoBehaviour
 
 	public void StartAnimation()
 	{
-		lineIndex = 0;
-		passedTime = 0.0f;
-		running = true;
+		if(!running)
+		{
+			Debug.Log("Start: " + name + Time.time);
+
+			lineIndex = 0;
+			time = 0.0f;
+			passedTime = 0.0f;
+			running = true;
+		}
 	}
 
 	public void StopAnimation()
 	{
-		running = false;
+		if(running)
+		{
+			Debug.Log("Stop: " + name + Time.time);
+
+			running = false;
+
+			foreach(Animatable animatable in animatables)
+			{
+				animatable.stopMovement();
+			}
+		}	
 	}
 }
