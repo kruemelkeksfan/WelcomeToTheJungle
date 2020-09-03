@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private GameObject head = null;
 	//[SerializeField] private GrapplingHook grapplingHook = null;
 	[Tooltip("A Collider at the Position of the Players Feet, used to check whether the Player is grounded")]
-	[SerializeField] private Collider feet = null;
+	[SerializeField] private Collider[] feet = null;
 	[SerializeField] private Animator standAnimator = null;
 	[SerializeField] private Animator walkAnimator = null;
 	private new Rigidbody rigidbody = null;
@@ -46,7 +46,15 @@ public class PlayerController : MonoBehaviour
 	{
 		rigidbody = gameObject.GetComponent<Rigidbody>();
 		contactList = new List<ContactPoint>(64);
-		feetDisplacement = feet.bounds.min.y - transform.position.y;
+		float miny = transform.position.y;
+		foreach(Collider foot in feet)
+		{
+			if(foot.bounds.min.y < miny)
+			{
+				miny = foot.bounds.min.y;
+			}
+		}
+		feetDisplacement = miny - transform.position.y;
 
 		Collider[] colliders = gameObject.GetComponentsInChildren<Collider>();
 		for(int i = 0; i < colliders.Length; ++i)
@@ -224,18 +232,25 @@ public class PlayerController : MonoBehaviour
 			stepUp(collision);
 		}
 
+		// TODO: Maybe just check for Y-Component of Collision Normals?
 		if(!grounded)
 		{
 			int contactCount = collision.GetContacts(contactList);
-			float maxMass = 0.0f;
+			float maxMass =  parentRigidbody != null ? parentRigidbody.mass : 0.0f;
 			for(int i = 0; i < contactCount; ++i)
 			{
-				if(contactList[i].thisCollider.Equals(feet))
+				foreach(Collider foot in feet)
 				{
-					grounded = true;
-					if((parentRigidbody = contactList[i].otherCollider.attachedRigidbody) != null && parentRigidbody.mass > maxMass)
+					if(contactList[i].thisCollider.Equals(foot))
 					{
-						maxMass = parentRigidbody.mass;
+						grounded = true;
+						if(contactList[i].otherCollider.attachedRigidbody != null && contactList[i].otherCollider.attachedRigidbody.mass > maxMass)
+						{
+							parentRigidbody = contactList[i].otherCollider.attachedRigidbody;
+							maxMass = parentRigidbody.mass;
+						}
+
+						break;
 					}
 				}
 			}
