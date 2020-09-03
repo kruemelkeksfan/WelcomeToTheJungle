@@ -27,7 +27,6 @@ public class Animatable : MonoBehaviour
 
 	public void move(int target, float time)
 	{
-		//Debug.Log("Start: " + Time.time);
 		if(target >= 0 && target < positions.Length && target < rotations.Length)
 		{
 			startposition = transform.localPosition;
@@ -46,7 +45,6 @@ public class Animatable : MonoBehaviour
 
 	public void stopMovement()
 	{
-		//Debug.Log("Stop: " + Time.time);
 		this.time = 0.0f;
 	}
 }

@@ -103,8 +103,6 @@ public class Animator : MonoBehaviour
 	{
 		if(!running)
 		{
-			Debug.Log("Start: " + name + Time.time);
-
 			lineIndex = 0;
 			time = 0.0f;
 			passedTime = 0.0f;
@@ -116,8 +114,6 @@ public class Animator : MonoBehaviour
 	{
 		if(running)
 		{
-			Debug.Log("Stop: " + name + Time.time);
-
 			running = false;
 
 			foreach(Animatable animatable in animatables)
