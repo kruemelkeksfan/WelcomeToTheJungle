@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour
 	[Tooltip("Minimum Time between 2 Jump Attempts")]
 	[SerializeField] private float jumpTime = 0.2f;
 	[SerializeField] private float maximumStepHeight = 0.4f;
+	[Tooltip("Slope Movement Penalty Modifier which adjusts the Influence of Slopes on Walking Speed")]
+	[SerializeField] private float slopeMovementFactor = 1.0f;
 	[Tooltip("Movement Speed Modifier when the Player is neither grounded nor grappled")]
 	[SerializeField] private float floatingMovementFactor = 0.002f;
 	[Tooltip("Movement Speed Modifier when the Player is grappled, but not grounded")]
@@ -33,6 +35,8 @@ public class PlayerController : MonoBehaviour
 	private Rigidbody parentRigidbody = null;
 	private List<ContactPoint> contactList = null;
 	private bool grounded = false;
+	private Dictionary<Vector3, Vector3> groundSlopes = null;
+	private Vector3 slope = Vector3.zero;
 	private float lastJump = 0.0f;
 	private float jumpCharge = 0.0f;
 	private float feetDisplacement = 0.0f;
@@ -46,6 +50,7 @@ public class PlayerController : MonoBehaviour
 	{
 		rigidbody = gameObject.GetComponent<Rigidbody>();
 		contactList = new List<ContactPoint>(64);
+		groundSlopes = new Dictionary<Vector3, Vector3>();
 		float miny = transform.position.y;
 		foreach(Collider foot in feet)
 		{
@@ -116,7 +121,8 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Calculate Movement
-		Vector3 direction = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical"));
+		//maxSlope = Vector3.zero;
+		Vector3 direction = (transform.right * Input.GetAxis("Horizontal") + slope * Input.GetAxis("Vertical"));
 		Vector3 tractionVelocityChange = Vector3.zero;
 		Vector3 movementVelocityChange = Vector3.zero;
 		if(direction != Vector3.zero || (grounded && parentRigidbody == null))
@@ -134,6 +140,8 @@ public class PlayerController : MonoBehaviour
 			{
 				speed *= sprintFactor;
 			}
+			// Slope Penalty
+			speed *= (1.0f - slope.y) * slopeMovementFactor;
 			// Avoid unwanted Deceleration
 			// TODO: Could get problematic if slow Effects should trigger in Motion
 			float sqrRigidbodySpeed = rigidbody.velocity.sqrMagnitude;
@@ -219,9 +227,10 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// Step up if Step is low enough
+	// TODO: Add Min Height to avoid stuttering on Slopes
 	private void OnCollisionEnter(Collision collision)
 	{
-		stepUp(collision);
+		//stepUp(collision);
 	}
 
 	// Only get grounded, when you stay longer than 1 Frame on a Collider
@@ -229,7 +238,19 @@ public class PlayerController : MonoBehaviour
 	{
 		if(Input.GetAxis("Horizontal") != 0.0f || Input.GetAxis("Vertical") != 0.0f)
 		{
-			stepUp(collision);
+			//stepUp(collision);
+
+		slope = transform.forward;
+		int contactCount = collision.GetContacts(contactList);
+		for(int i = 0; i < contactCount; ++i)
+		{
+			Vector3 currentSlope = Vector3.Cross(transform.right, contactList[i].normal);
+			if(currentSlope.y > slope.y)
+			{
+				slope = currentSlope;
+			}
+		}
+		Debug.Log("Max: " + slope);
 		}
 
 		// TODO: Maybe just check for Y-Component of Collision Normals?
