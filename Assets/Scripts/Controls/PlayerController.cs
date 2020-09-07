@@ -16,9 +16,8 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private float jumpStrength = 2000.0f;
 	[Tooltip("Minimum Time between 2 Jump Attempts")]
 	[SerializeField] private float jumpTime = 0.2f;
+	[SerializeField] private float minimumStepHeight = 0.02f;
 	[SerializeField] private float maximumStepHeight = 0.4f;
-	[Tooltip("Slope Movement Penalty Modifier which adjusts the Influence of Slopes on Walking Speed")]
-	[SerializeField] private float slopeMovementFactor = 1.0f;
 	[Tooltip("Movement Speed Modifier when the Player is neither grounded nor grappled")]
 	[SerializeField] private float floatingMovementFactor = 0.002f;
 	[Tooltip("Movement Speed Modifier when the Player is grappled, but not grounded")]
@@ -26,7 +25,7 @@ public class PlayerController : MonoBehaviour
 	[Tooltip("The maximum Acceleration, that can be applied by standing on another moving Rigidbody")]
 	[SerializeField] private float tractionAcceleration = 20.0f;
 	[SerializeField] private GameObject head = null;
-	//[SerializeField] private GrapplingHook grapplingHook = null;
+	[SerializeField] private GrapplingHook grapplingHook = null;
 	[Tooltip("A Collider at the Position of the Players Feet, used to check whether the Player is grounded")]
 	[SerializeField] private Collider[] feet = null;
 	[SerializeField] private Animator standAnimator = null;
@@ -77,7 +76,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// Remember: Instantanious Input like GetKeyDown is processed by the first Update() after Key-Press, so it could be missed in FixedUpdate().
-	//		Therefore only use GetAxis() and GetButton() in FixedUpdate() and buffer everything else in an Update() Call. 
+	//		Therefore only use GetAxis() and GetButton() in FixedUpdate() and buffer everything else in an Update() Call.
 	private void FixedUpdate()
 	{
 		if(!mouseVisible)
@@ -121,7 +120,6 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Calculate Movement
-		//maxSlope = Vector3.zero;
 		Vector3 direction = (transform.right * Input.GetAxis("Horizontal") + slope * Input.GetAxis("Vertical"));
 		Vector3 tractionVelocityChange = Vector3.zero;
 		Vector3 movementVelocityChange = Vector3.zero;
@@ -141,7 +139,7 @@ public class PlayerController : MonoBehaviour
 				speed *= sprintFactor;
 			}
 			// Slope Penalty
-			speed *= (1.0f - slope.y) * slopeMovementFactor;
+			speed *= 1.0f - slope.y;
 			// Avoid unwanted Deceleration
 			// TODO: Could get problematic if slow Effects should trigger in Motion
 			float sqrRigidbodySpeed = rigidbody.velocity.sqrMagnitude;
@@ -155,11 +153,11 @@ public class PlayerController : MonoBehaviour
 			// Ground and Grappling Bonus
 			if(!grounded)
 			{
-				/*if(grapplingHook != null && grapplingHook.Hooked)
+				if(grapplingHook != null && grapplingHook.Hooked)
 				{
 					acceleration *= grappledMovementFactor;
 				}
-				else*/
+				else
 				{
 					acceleration *= floatingMovementFactor;
 				}
@@ -227,37 +225,21 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// Step up if Step is low enough
-	// TODO: Add Min Height to avoid stuttering on Slopes
 	private void OnCollisionEnter(Collision collision)
 	{
-		//stepUp(collision);
+		stepUp(collision);
 	}
 
 	// Only get grounded, when you stay longer than 1 Frame on a Collider
 	private void OnCollisionStay(Collision collision)
 	{
-		if(Input.GetAxis("Horizontal") != 0.0f || Input.GetAxis("Vertical") != 0.0f)
-		{
-			//stepUp(collision);
-
-		slope = transform.forward;
-		int contactCount = collision.GetContacts(contactList);
-		for(int i = 0; i < contactCount; ++i)
-		{
-			Vector3 currentSlope = Vector3.Cross(transform.right, contactList[i].normal);
-			if(currentSlope.y > slope.y)
-			{
-				slope = currentSlope;
-			}
-		}
-		Debug.Log("Max: " + slope);
-		}
+		stepUp(collision);
 
 		// TODO: Maybe just check for Y-Component of Collision Normals?
 		if(!grounded)
 		{
 			int contactCount = collision.GetContacts(contactList);
-			float maxMass =  parentRigidbody != null ? parentRigidbody.mass : 0.0f;
+			float maxMass = parentRigidbody != null ? parentRigidbody.mass : 0.0f;
 			for(int i = 0; i < contactCount; ++i)
 			{
 				foreach(Collider foot in feet)
@@ -300,27 +282,46 @@ public class PlayerController : MonoBehaviour
 
 	private void stepUp(Collision collision)
 	{
-		if(stepTime < -stepDelay)                                                                                                                                       // Previous Step must be complete
+		if(Input.GetAxis("Horizontal") != 0.0f || Input.GetAxis("Vertical") != 0.0f)
 		{
+			slope = transform.forward;
 			int contactCount = collision.GetContacts(contactList);
 			for(int i = 0; i < contactCount; ++i)
 			{
-				if(contactList[i].point.y > (transform.position.y + feetDisplacement + 0.02f))                                                                          // Is it actually an upward Step?
+				Vector3 currentSlope = Vector3.Cross(transform.right, contactList[i].normal);
+				if(currentSlope.y > slope.y)
 				{
-					Vector3 stepStart = new Vector3(transform.position.x, (transform.position.y + feetDisplacement + maximumStepHeight), transform.position.z);
-					Vector3 stepTarget = new Vector3(contactList[i].point.x, (transform.position.y + feetDisplacement + maximumStepHeight), contactList[i].point.z);
-					Vector3 stepDirection = stepTarget - stepStart;
-					if(rigidbody.velocity == Vector3.zero || Vector3.Angle(rigidbody.velocity, stepDirection) <= 90.0f)                                                 // Is the Step actually in the Way of the Player?
+					slope = currentSlope;
+				}
+			}
+
+			if(Vector3.Angle(slope, transform.forward) > 50.0f)
+			{
+				if(stepTime < -stepDelay)                                                                                                                                       // Previous Step must be complete
+				{
+					for(int i = 0; i < contactCount; ++i)
 					{
-						if(!Physics.Raycast(stepStart, stepDirection, stepDirection.magnitude + 0.02f))                                                                 // Is the Path for the Step clear and the Step itself not too high?
+						if(contactList[i].point.y > (transform.position.y + feetDisplacement + 0.02f))                                                                          // Is it actually an upward Step?
 						{
-							RaycastHit hit;
-							if(contactList[i].otherCollider.Raycast(new Ray(stepTarget, Vector3.down), out hit, maximumStepHeight))                                     // How high is the Step exactly?
+							Vector3 stepStart = new Vector3(transform.position.x, (transform.position.y + feetDisplacement + maximumStepHeight), transform.position.z);
+							Vector3 stepTarget = new Vector3(contactList[i].point.x, (transform.position.y + feetDisplacement + maximumStepHeight), contactList[i].point.z);
+							Vector3 stepDirection = stepTarget - stepStart;
+							if(rigidbody.velocity == Vector3.zero || Vector3.Angle(rigidbody.velocity, stepDirection) <= 90.0f)                                                 // Is the Step actually in the Way of the Player?
 							{
-								float stepHeight = hit.point.y - (transform.position.y + feetDisplacement);
-								rigidbody.velocity = ((Vector3.up * (2.0f + (stepHeight * 4.0f))) + (-stepDirection.normalized));                                       // Reset Velocity and apply Height dependent upward Force
-								stepTime = Time.time + stepHeight * 0.4f;                                                                                               // Height dependent Delay for stepping forward
-								stepForward = stepDirection.normalized * (2.0f + (stepHeight * 2.0f));                                                                  // Height dependent Step forward Direction
+								if(!Physics.Raycast(stepStart, stepDirection, stepDirection.magnitude + 0.02f))                                                                 // Is the Path for the Step clear and the Step itself not too high?
+								{
+									RaycastHit hit;
+									if(Physics.Raycast(new Ray(stepTarget, Vector3.down), out hit, maximumStepHeight))                                                          // How high is the Step exactly?
+									{
+										float stepHeight = hit.point.y - (transform.position.y + feetDisplacement);                                                             // Calculate exact Step height
+										if(stepHeight >= minimumStepHeight)                                                                                                     // Is the Step high enough (to avoid jittery Movement on Slopes)?
+										{
+											rigidbody.velocity = ((Vector3.up * (2.0f + (stepHeight * 4.0f))) + (-stepDirection.normalized));                                   // Reset Velocity and apply Height dependent upward Force
+											stepTime = Time.time + stepHeight * 0.4f;                                                                                           // Height dependent Delay for stepping forward
+											stepForward = stepDirection.normalized * (2.0f + (stepHeight * 2.0f));                                                              // Height dependent Step forward Direction
+										}
+									}
+								}
 							}
 						}
 					}
