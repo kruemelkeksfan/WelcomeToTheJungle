@@ -173,12 +173,14 @@ MonoBehaviour:
   chunkSize: 50
   bushSize: 2
   treeSize: 20
-  bushChance: 0.8
-  treeChance: 0.8
+  bushChance: 0.95
+  treeChance: 0.95
   bushPrefabs:
   - {fileID: 3662705853011697819, guid: ef5da23a0950ec2459d512820eada8c5, type: 3}
   - {fileID: 8424177160386935188, guid: 1677fdf0d4f99d54d98499cf6dcea41f, type: 3}
   - {fileID: 833013899631762739, guid: 01c8eea196324b640aff676a7a0d09c4, type: 3}
   treePrefabs:
-  - {fileID: 1229480046977998332, guid: b81e554f01c92dd46b683983f36869cb, type: 3}
-  - {fileID: 465368990713670387, guid: 87974a8050240cb4fa96b5f06cf7af91, type: 3}
+  - {fileID: 2839820300211178657, guid: 87974a8050240cb4fa96b5f06cf7af91, type: 3}
+  - {fileID: 5678056228065126457, guid: b81e554f01c92dd46b683983f36869cb, type: 3}
+  renderDistance: 600
+  renderDistanceUpdateInterval: 4
