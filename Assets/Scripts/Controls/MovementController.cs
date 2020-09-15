@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class MovementController : MonoBehaviour
 {
 	[Tooltip("Maximum look down Angle, Front is 0/360 Degrees, straight down 90/360 Degrees")]
 	[SerializeField] private float maxLookDown = 90.0f;
@@ -45,6 +45,11 @@ public class PlayerController : MonoBehaviour
 	private float stepDelay = 0.2f;
 	private bool mouseVisible = false;
 
+	public Vector2 RotationInput { get; set; } = Vector2.zero;
+	public Vector2 MovementInput { get; set; } = Vector2.zero;
+	public bool SprintInput { get; set; } = false;
+	public bool JumpInput { get; set; } = false;
+
 	private void Start()
 	{
 		rigidbody = gameObject.GetComponent<Rigidbody>();
@@ -75,7 +80,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	// Remember: Instantanious Input like GetKeyDown is processed by the first Update() after Key-Press, so it could be missed in FixedUpdate().
+	// Remember: Instantanious Input like GetKeyDown is consumed by the first Update() after Key-Press, so it could be missed in FixedUpdate().
 	//		Therefore only use GetAxis() and GetButton() in FixedUpdate() and buffer everything else in an Update() Call.
 	private void FixedUpdate()
 	{
@@ -91,8 +96,8 @@ public class PlayerController : MonoBehaviour
 				rotation.x = head.transform.rotation.eulerAngles.x;
 			}
 
-			rotation.x += -Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
-			rotation.y += Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+			rotation.x += -RotationInput.y * rotationSpeed * Time.deltaTime;
+			rotation.y += RotationInput.x * rotationSpeed * Time.deltaTime;
 			rotation.z = 0.0f;
 
 			if(rotation.x < 180 && rotation.x > maxLookDown)
@@ -120,7 +125,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Calculate Movement
-		Vector3 direction = (transform.right * Input.GetAxis("Horizontal") + slope * Input.GetAxis("Vertical"));
+		Vector3 direction = (transform.right * MovementInput.x + slope * MovementInput.y);
 		Vector3 tractionVelocityChange = Vector3.zero;
 		Vector3 movementVelocityChange = Vector3.zero;
 		if(direction != Vector3.zero || (grounded && parentRigidbody == null))
@@ -134,7 +139,7 @@ public class PlayerController : MonoBehaviour
 			// Calculate Speed
 			float speed = movementSpeed;
 			// Sprint Bonus
-			if(Input.GetButton("Sprint") && Vector3.Angle(transform.forward, direction) <= 45.0f)
+			if(SprintInput && Vector3.Angle(transform.forward, direction) <= 45.0f)
 			{
 				speed *= sprintFactor;
 			}
@@ -201,7 +206,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Jumping
-		if(Input.GetButton("Jump"))
+		if(JumpInput)
 		{
 			if((Time.time - lastJump) >= jumpTime && grounded)
 			{
@@ -282,7 +287,7 @@ public class PlayerController : MonoBehaviour
 
 	private void stepUp(Collision collision)
 	{
-		if(Input.GetAxis("Horizontal") != 0.0f || Input.GetAxis("Vertical") != 0.0f)
+		if(MovementInput != Vector2.zero)
 		{
 			slope = transform.forward;
 			int contactCount = collision.GetContacts(contactList);

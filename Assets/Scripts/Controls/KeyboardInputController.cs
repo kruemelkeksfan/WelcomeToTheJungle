@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WeaponController : MonoBehaviour
+public class KeyboardInputController : MonoBehaviour
 {
+	[SerializeField] private MovementController movement = null;
 	[SerializeField] private Weapon weapon = null;
 
 	private Text magazineIndicator = null;
@@ -12,12 +13,20 @@ public class WeaponController : MonoBehaviour
 
 	private void Start()
 	{
-		magazineIndicator = GameObject.Find("MagazineIndicator").GetComponentInChildren<Text>();
-		firemodeIndicator = GameObject.Find("FiremodeIndicator").GetComponentInChildren<Text>();
+		magazineIndicator = GameObject.Find("MagazineIndicator")?.GetComponentInChildren<Text>();
+		firemodeIndicator = GameObject.Find("FiremodeIndicator")?.GetComponentInChildren<Text>();
 	}
 
 	private void Update()
 	{
+		if(movement != null)
+		{
+			movement.RotationInput = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+			movement.MovementInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+			movement.SprintInput = Input.GetButton("Sprint");
+			movement.JumpInput = Input.GetButton("Jump");
+		}
+
 		if(weapon != null)
 		{
 			if(Input.GetButtonDown("Fire"))

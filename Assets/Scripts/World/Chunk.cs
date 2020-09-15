@@ -65,7 +65,7 @@ public class Chunk : MonoBehaviour
 		renderDistance = renderDistance * renderDistance;
 
 		// TODO: Don't use Find 2000x on Startup (once for each Chunk)
-		PlayerController[] playerControllers = FindObjectsOfType<PlayerController>();
+		MovementController[] playerControllers = FindObjectsOfType<MovementController>();
 		players = new Transform[playerControllers.Length];
 		for(int i = 0; i < players.Length; ++i)
 		{

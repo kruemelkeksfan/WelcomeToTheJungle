@@ -601,7 +601,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3601267851860210214}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: c5a32cecb8937a445a6066a4ef5e4737, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.06
@@ -619,6 +619,7 @@ GameObject:
   - component: {fileID: 8604774741572993607}
   - component: {fileID: 8459408760163961413}
   - component: {fileID: 4758689424731694983}
+  - component: {fileID: 802883639102356569}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -679,17 +680,33 @@ MonoBehaviour:
   sprintFactor: 2
   jumpStrength: 2000
   jumpTime: 0.2
+  minimumStepHeight: 0.02
   maximumStepHeight: 1
   floatingMovementFactor: 0.002
   grappledMovementFactor: 0.5
   tractionAcceleration: 20
   head: {fileID: 1045183133918310564}
+  grapplingHook: {fileID: 0}
   feet:
   - {fileID: 9136431878511935416}
   - {fileID: 1935974083980903125}
   - {fileID: 5211247735040811757}
   standAnimator: {fileID: 7178696601881849447}
   walkAnimator: {fileID: 2840009198394977843}
+--- !u!114 &802883639102356569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3790351371077099844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56c97d03370f79f46a0f4032a896173a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movement: {fileID: 4758689424731694983}
+  weapon: {fileID: 0}
 --- !u!1 &3888884127550768874
 GameObject:
   m_ObjectHideFlags: 0
