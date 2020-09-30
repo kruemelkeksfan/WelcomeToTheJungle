@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class Chunk : MonoBehaviour
 {
-	[SerializeField] private Transform chunkCenter = null;
+	private static List<Transform> players = new List<Transform>();
+	private static Vector2[] directions = { new Vector2(-1.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, -1.0f), new Vector2(-1.0f, -1.0f) };
+	[SerializeField] private GameObject modelParent = null;
+	[SerializeField] private GameObject chunkCenter = null;
 	[SerializeField] private float chunkSize = 50.0f;
 	[SerializeField] private float bushSize = 2.0f;
 	[SerializeField] private float treeSize = 20.0f;
@@ -14,29 +17,32 @@ public class Chunk : MonoBehaviour
 	[SerializeField] private GameObject[] treePrefabs = null;
 	[SerializeField] private float renderDistance = 1000.0f;
 	[SerializeField] private float renderDistanceUpdateInterval = 2.0f;
-	private Vector2[] directions = { new Vector2(-1.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, -1.0f), new Vector2(-1.0f, -1.0f) };
-	private GameObject chunkMesh = null;
-	private List<GameObject> trees = null;
-	private List<GameObject> bushes = null;
-	private Transform[] players = null;
+
+	public static void AddPlayer(Transform player)
+	{
+		if(!players.Contains(player))
+		{
+			players.Add(player);
+		}
+	}
+
+	public static void RemovePlayer(Transform player)
+	{
+		players.Remove(player);
+	}
 
 	private void Start()
 	{
-		chunkMesh = GetComponentInChildren<MeshRenderer>().gameObject;
-		trees = new List<GameObject>(4);
-		bushes = new List<GameObject>(16);
-
-		int minimumTreeOffset = Mathf.RoundToInt(treeSize / 2.0f);
-		int maximumTreeOffset = Mathf.RoundToInt(chunkSize / 2.0f - minimumTreeOffset);
-		int minimumBushOffset = Mathf.RoundToInt(bushSize / 2.0f);
+		int minimumTreeOffset = Mathf.RoundToInt(treeSize * 0.5f);
+		int maximumTreeOffset = Mathf.RoundToInt(chunkSize * 0.5f - minimumTreeOffset);
+		int minimumBushOffset = Mathf.RoundToInt(bushSize * 0.5f);
 		int maximumBushOffset = Mathf.RoundToInt(minimumTreeOffset - minimumBushOffset);
 		foreach(Vector2 treeDirection in directions)
 		{
-			Vector3 treePosition = chunkCenter.position + new Vector3(Random.Range(minimumTreeOffset, maximumTreeOffset) * treeDirection.x, 0.0f, Random.Range(minimumTreeOffset, maximumTreeOffset) * treeDirection.y);
+			Vector3 treePosition = chunkCenter.transform.position + new Vector3(Random.Range(minimumTreeOffset, maximumTreeOffset) * treeDirection.x, 0.0f, Random.Range(minimumTreeOffset, maximumTreeOffset) * treeDirection.y);
 			if(Random.value < treeChance)
 			{
-				GameObject tree = GameObject.Instantiate(treePrefabs[Random.Range(0, treePrefabs.Length)], treePosition, Quaternion.Euler(new Vector3(0.0f, Random.Range(0, 8) * 45.0f, 0.0f)), transform);
-				trees.Add(tree);
+				GameObject tree = GameObject.Instantiate(treePrefabs[Random.Range(0, treePrefabs.Length)], treePosition, Quaternion.Euler(new Vector3(0.0f, Random.Range(0, 8) * 45.0f, 0.0f)), modelParent.transform);
 			}
 
 			foreach(Vector2 bushDirection in directions)
@@ -55,22 +61,13 @@ public class Chunk : MonoBehaviour
 						}
 					}
 
-					GameObject bush = GameObject.Instantiate(bushPrefabs[Random.Range(0, bushPrefabs.Length)], bushPosition, rotation, transform);
+					GameObject bush = GameObject.Instantiate(bushPrefabs[Random.Range(0, bushPrefabs.Length)], bushPosition, rotation, modelParent.transform);
 					bush.transform.Rotate(Vector3.up, Random.Range(0, 8) * 45.0f, 0.0f);
-					bushes.Add(bush);
 				}
 			}
 		}
 
 		renderDistance = renderDistance * renderDistance;
-
-		// TODO: Don't use Find 2000x on Startup (once for each Chunk)
-		MovementController[] playerControllers = FindObjectsOfType<MovementController>();
-		players = new Transform[playerControllers.Length];
-		for(int i = 0; i < players.Length; ++i)
-		{
-			players[i] = playerControllers[i].transform;
-		}
 
 		StartCoroutine(CheckRenderDistance());
 	}
@@ -80,6 +77,9 @@ public class Chunk : MonoBehaviour
 		yield return new WaitForSeconds(Random.value * renderDistanceUpdateInterval);
 
 		// TODO: Intermediate Visibility Stage with simplified Models
+		// TODO: Alternative Algithm: Use Hashmap with x/y-Coordinates and Loop over Coordinates in Square around Player to enable them,
+		//	think of something clever to disable them, e.g. write SetActive(false) in Code on Object, so that it is only called while Object is enabled,
+		//	requires timing to have the SetActive(true) after the SetActive(false), maybe refresh a timer on SetActive(true) and only SetActive(false) when time is up
 		while(true)
 		{
 			bool outOfRange = true;
@@ -87,15 +87,7 @@ public class Chunk : MonoBehaviour
 			{
 				if((player.position - transform.position).sqrMagnitude < renderDistance)
 				{
-					chunkMesh.SetActive(true);
-					foreach(GameObject tree in trees)
-					{
-						tree.SetActive(true);
-					}
-					foreach(GameObject bush in bushes)
-					{
-						bush.SetActive(true);
-					}
+					modelParent.SetActive(true);
 
 					outOfRange = false;
 					break;
@@ -104,15 +96,7 @@ public class Chunk : MonoBehaviour
 
 			if(outOfRange)
 			{
-				chunkMesh.SetActive(false);
-				foreach(GameObject tree in trees)
-				{
-					tree.SetActive(false);
-				}
-				foreach(GameObject bush in bushes)
-				{
-					bush.SetActive(false);
-				}
+				modelParent.SetActive(false);
 			}
 
 			yield return new WaitForSeconds(renderDistanceUpdateInterval);
