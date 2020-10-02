@@ -290,6 +290,12 @@ public class MovementController : MonoBehaviour
 		if(MovementInput != Vector2.zero)
 		{
 			slope = transform.forward;
+			// TODO: Find out why the heck ContactList sometimes is not set here
+			if(contactList == null)
+			{
+				contactList = new List<ContactPoint>(64);
+				Debug.LogWarning("ContactList in MovementController was null!");
+			}
 			int contactCount = collision.GetContacts(contactList);
 			for(int i = 0; i < contactCount; ++i)
 			{

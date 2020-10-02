@@ -121,80 +121,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &323422788
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 3790351371077099844, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_Name
-      value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 6859370697228779200, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: far clip plane
-      value: 600
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8604774741572993607, guid: 3da6cf7f125b0e34b8f46589810f1f65,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 3da6cf7f125b0e34b8f46589810f1f65, type: 3}
 --- !u!1 &563037450
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,8 +150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8befd43dfa59e74f984f2731fd7c025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 40
-  height: 40
+  width: 20
+  height: 20
   chunkSize: 50
   terrainSmoothness: 200
   terrainSteepness: 40

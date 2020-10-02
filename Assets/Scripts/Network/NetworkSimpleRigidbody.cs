@@ -2,24 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NetworkSimpleRigidbody : NetworkRigidbody
+public class NetworkSimpleRigidbody : NetworkObject
 {
-    [SerializeField] protected new SimpleRigidbody rigidbody = null;
+    [SerializeField] private new SimpleRigidbody rigidbody = null;
+    [SerializeField] private float positionTolerance = 0.4f;
+    [SerializeField] private float networkUpdateInterval = 0.2f;
+    private Vector3 lastPosition = Vector3.zero;
+    private Vector3 lastVelocity = Vector3.zero;
+    private float lastUpdate = 0.0f;
 
 	private void FixedUpdate()
 	{
 		float dTime = Time.time - lastUpdate;
         Vector3 predictedPosition = lastPosition + lastVelocity * dTime;
-        Vector3 predictedRotation = lastRotation + lastRotationVelocity * dTime;
-        if((predictedPosition - rigidbody.transform.position).sqrMagnitude > positionTolerance
-            || (predictedRotation - rigidbody.transform.rotation.eulerAngles).sqrMagnitude > rotationTolerance)
+        if((predictedPosition - rigidbody.transform.position).sqrMagnitude > positionTolerance)
 		{
-            network.SendToHost(); // TODO: New Position and Rotation and Velocities
+            //network.SendToHost(); // TODO: New Position and Rotation and Velocities
 
             lastPosition = rigidbody.transform.position;
-            lastRotation = rigidbody.transform.rotation.eulerAngles;
             lastVelocity = rigidbody.Velocity;
-            lastRotationVelocity = Vector3.zero;
             lastUpdate = Time.time;
 		}
 	}
