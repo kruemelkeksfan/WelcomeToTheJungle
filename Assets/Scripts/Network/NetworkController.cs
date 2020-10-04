@@ -146,10 +146,8 @@ public class NetworkController : MonoBehaviour
 					&& float.TryParse(message[11], out rotationVelocityX) && float.TryParse(message[12], out rotationVelocityY) && float.TryParse(message[13], out rotationVelocityZ)
 					&& networkObjects.ContainsKey(id) && networkObjects[id] is NetworkRigidbody)
 				{
-					Debug.LogWarning(positionX +" "+ positionY +" "+ positionZ);
 					((NetworkRigidbody) networkObjects[id]).UpdatePosition(positionX, positionY, positionZ, rotationX, rotationY, rotationZ, velocityX, velocityY, velocityZ, rotationVelocityX, rotationVelocityY, rotationVelocityZ);
 				}
-				Debug.LogWarning(networkObjects.ContainsKey(id) + " " + (networkObjects[id] is NetworkRigidbody));
 			}
 			// Host
 			else if(IsHost && message.Length == 2 && message[1] == "Join")
@@ -181,6 +179,8 @@ public class NetworkController : MonoBehaviour
 					}
 
 					NetworkObject player = Instantiate(playerPrefab, spawnPoint, Quaternion.identity).GetComponent<NetworkObject>();
+					player.gameObject.name = message[0];
+					player.SetID();
 					players.Add(message[0], player.GetComponent<NetworkInputController>());
 					Chunk.AddPlayer(player.transform);
 					SendToClients("InstantiatePlayer " + message[0] + " " + GetInstantiationString(player));
@@ -470,6 +470,7 @@ public class NetworkController : MonoBehaviour
 		yield return null;
 		GameObject player = Instantiate(playerPrefab, spawnPoint, Quaternion.identity);
 		player.gameObject.name = Username;
+		player.GetComponent<NetworkObject>().SetID();
 		player.GetComponentInChildren<Camera>().enabled = true;
 		player.GetComponentInChildren<AudioListener>().enabled = true;
 		player.GetComponentInChildren<KeyboardInputController>().enabled = true;

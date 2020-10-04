@@ -13,17 +13,7 @@ public class NetworkObject : MonoBehaviour
 
 	protected virtual void Start()
 	{
-		network = NetworkController.instance;
-		if(network != null && network.IsHost)
-		{
-			ID = ++idCounter;
-			if(idCounter > maxId)
-			{
-				Debug.LogWarning("Network IDs nearly exhausted, newest ID is " + ID);
-			}
-
-			network.AddNetworkObject(this);
-		}
+		SetID();
 	}
 
 	private void OnDestroy()
@@ -31,7 +21,7 @@ public class NetworkObject : MonoBehaviour
 		network.RemoveNetworkObject(this);
 		if(ID == 0)
 		{
-			Debug.LogError("ID: " + ID + " " + name);
+			Debug.LogError("NetworkObject " + name + " had no ID!");
 		}
 	}
 
@@ -40,17 +30,49 @@ public class NetworkObject : MonoBehaviour
 		return path;
 	}
 
-	public void SetID(uint id)
+	public void SetID(uint id = 0)
 	{
-		network = NetworkController.instance;
-		if(network != null && network.IsClient)
+		if(ID == 0)
 		{
-			this.ID = id;
-			network.AddNetworkObject(this);
-		}
-		else
-		{
-			Debug.LogError("Can not assign a custom NetworkObject-ID on a Host!");
+			network = NetworkController.instance;
+			if(network != null)
+			{
+				if(network.IsHost)
+				{
+					if(id != 0)
+					{
+						Debug.LogWarning("Trying to set explicit NetworkObject ID " + id + " on Host!");
+					}
+
+					ID = ++idCounter;
+					if(idCounter > maxId)
+					{
+						Debug.LogWarning("Network IDs nearly exhausted, newest ID is " + ID);
+					}
+
+					network.AddNetworkObject(this);
+				}
+				else if(network.IsClient)
+				{
+					if(id != 0)
+					{
+						this.ID = id;
+						network.AddNetworkObject(this);
+					}
+					else
+					{
+						Debug.LogError("Trying to set NetworkObject ID without providing an ID on Client!");
+					}
+				}
+				else
+				{
+					Debug.LogError("Trying to set NetworkObject ID without being Host nor Client!");
+				}
+			}
+			else
+			{
+				Debug.LogError("Trying to set ID on NetworkObject without NetworkController!!");
+			}
 		}
 	}
 }

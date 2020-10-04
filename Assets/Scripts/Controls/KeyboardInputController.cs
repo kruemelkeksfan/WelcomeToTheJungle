@@ -22,14 +22,14 @@ public class KeyboardInputController : MonoBehaviour
 	{
 		if(movement != null)
 		{
-			Vector2 newMovement = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-			Vector2 newRotation = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+			Vector2 newRotation = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+			Vector2 newMovement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 			if(newMovement != movement.RotationInput || newRotation != movement.MovementInput)
 			{
-				network?.SendMovementUpdate(movement.RotationInput, movement.MovementInput);
+				network?.SendMovementUpdate(newRotation, newMovement);
 			}
-			movement.RotationInput = newMovement;
-			movement.MovementInput = newRotation;
+			movement.RotationInput = newRotation;
+			movement.MovementInput = newMovement;
 
 			if(Input.GetButtonDown("Sprint"))
 			{
