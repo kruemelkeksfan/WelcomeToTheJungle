@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 public class Animator : MonoBehaviour
@@ -21,6 +22,8 @@ public class Animator : MonoBehaviour
 
 	private void Start()
 	{
+		CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+
 		if(animation.Length <= 0)
 		{
 			Debug.LogWarning("Empty Animation " + name + "!");
