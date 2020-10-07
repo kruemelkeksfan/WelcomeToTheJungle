@@ -5,7 +5,7 @@ using UnityEngine;
 public class Chunk : MonoBehaviour
 {
 	private static List<Transform> players = new List<Transform>();
-	private static Vector2[] directions = { new Vector2(-1.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, -1.0f), new Vector2(-1.0f, -1.0f) };
+	private static Vector2[] directions = { Vector2.zero, new Vector2(-1.0f, 1.0f), new Vector2(1.0f, 1.0f), new Vector2(1.0f, -1.0f), new Vector2(-1.0f, -1.0f) };
 	[SerializeField] private GameObject modelParent = null;
 	[SerializeField] private GameObject chunkCenter = null;
 	[SerializeField] private float chunkSize = 50.0f;
@@ -41,21 +41,22 @@ public class Chunk : MonoBehaviour
 			int maximumTreeOffset = Mathf.RoundToInt(chunkSize * 0.5f - minimumTreeOffset);
 			int minimumBushOffset = Mathf.RoundToInt(bushSize * 0.5f);
 			int maximumBushOffset = Mathf.RoundToInt(minimumTreeOffset - minimumBushOffset);
+			int plantCounter = 0;
 			foreach(Vector2 treeDirection in directions)
 			{
 				Vector3 treePosition = chunkCenter.transform.position + new Vector3(Random.Range(minimumTreeOffset, maximumTreeOffset) * treeDirection.x, 0.0f, Random.Range(minimumTreeOffset, maximumTreeOffset) * treeDirection.y);
 				if(Random.value < treeChance)
 				{
 					GameObject tree = GameObject.Instantiate(treePrefabs[Random.Range(0, treePrefabs.Length)], treePosition, Quaternion.Euler(new Vector3(0.0f, Random.Range(0, 8) * 45.0f, 0.0f)), modelParent.transform);
+					tree.transform.localScale *= 1.0f - 0.001f * plantCounter++;
 				}
 
 				foreach(Vector2 bushDirection in directions)
 				{
-					if(Random.value < bushChance)
+					if(bushDirection != Vector2.zero && Random.value < bushChance)
 					{
 						Vector3 bushPosition = treePosition + new Vector3(Random.Range(minimumBushOffset, maximumBushOffset) * bushDirection.x, 0.0f, Random.Range(minimumBushOffset, maximumBushOffset) * bushDirection.y);
 
-						Quaternion rotation = Quaternion.identity;
 						RaycastHit hit;
 						if(Physics.Raycast(bushPosition + Vector3.up * bushSize * 2.0f, Vector3.down, out hit, bushSize * 2.0f))
 						{
@@ -65,8 +66,8 @@ public class Chunk : MonoBehaviour
 							}
 						}
 
-						GameObject bush = GameObject.Instantiate(bushPrefabs[Random.Range(0, bushPrefabs.Length)], bushPosition, rotation, modelParent.transform);
-						bush.transform.Rotate(Vector3.up, Random.Range(0, 8) * 45.0f, 0.0f);
+						GameObject bush = GameObject.Instantiate(bushPrefabs[Random.Range(0, bushPrefabs.Length)], bushPosition, Quaternion.Euler(new Vector3(0.0f, Random.Range(0, 8) * 45.0f, 0.0f)), modelParent.transform);
+						bush.transform.localScale *= 1.0f - 0.001f * plantCounter++;
 					}
 				}
 			}
