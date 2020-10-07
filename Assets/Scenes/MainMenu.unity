@@ -1944,7 +1944,7 @@ MonoBehaviour:
   timeoutDuration: 2
   playerPrefab: {fileID: 3790351371077099844, guid: 3da6cf7f125b0e34b8f46589810f1f65,
     type: 3}
-  spawnPoint: {x: 0, y: 40, z: 0}
+  spawnPoint: {x: 0, y: 40, z: -10}
 --- !u!4 &1693563218
 Transform:
   m_ObjectHideFlags: 0
