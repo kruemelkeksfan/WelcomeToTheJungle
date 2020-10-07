@@ -739,6 +739,7 @@ MonoBehaviour:
   rigidbody: {fileID: 8459408760163961413}
   positionTolerance: 0.2
   rotationTolerance: 10
+  correctionTime: 0.5
 --- !u!1 &3888884127550768874
 GameObject:
   m_ObjectHideFlags: 0
