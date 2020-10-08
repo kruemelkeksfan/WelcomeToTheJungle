@@ -16,8 +16,11 @@ public class KeyboardInputController : MonoBehaviour
 	{
 		magazineIndicator = GameObject.Find("MagazineIndicator")?.GetComponentInChildren<Text>();
 		firemodeIndicator = GameObject.Find("FiremodeIndicator")?.GetComponentInChildren<Text>();
-		id = gameObject.GetComponentInChildren<NetworkObject>().ID;
 		network = NetworkController.instance;
+		if(network != null)
+		{
+			id = gameObject.GetComponentInChildren<NetworkObject>().ID;
+		}
 	}
 
 	private void Update()
