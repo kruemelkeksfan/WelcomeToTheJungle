@@ -41,7 +41,7 @@ public class MovementController : MonoBehaviour
 	private float feetDisplacement = 0.0f;
 	private float topDisplacement = 0.0f;
 	private float stepTime = 0.0f;
-	private Vector3 stepForward = Vector3.zero;
+	private Vector3 stepForward = Vector3.forward;
 	private float stepDelay = 0.2f;
 	private bool mouseVisible = false;
 
@@ -144,7 +144,7 @@ public class MovementController : MonoBehaviour
 				speed *= sprintFactor;
 			}
 			// Slope Penalty
-			speed *= 1.0f - slope.y;
+			speed *= 1.0f - slope.y * 0.6f;
 			// Avoid unwanted Deceleration
 			// TODO: Could get problematic if slow Effects should trigger in Motion
 			float sqrRigidbodySpeed = rigidbody.velocity.sqrMagnitude;
@@ -305,6 +305,7 @@ public class MovementController : MonoBehaviour
 					slope = currentSlope;
 				}
 			}
+			slope = slope.normalized;
 
 			if(Vector3.Angle(slope, transform.forward) > 50.0f)
 			{

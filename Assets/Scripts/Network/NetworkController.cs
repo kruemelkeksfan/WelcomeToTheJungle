@@ -207,7 +207,7 @@ public class NetworkController : MonoBehaviour
 					}
 				}
 			}
-			else if(IsHost && message.Length == 6 && message[1] == "MovementUpdate")
+			else if(IsHost && message.Length == 6 && message[1] == "MovementUpdate")	// TODO: Send and receive MovementUpdate to/on all Clients
 			{
 				float rotationX;
 				float rotationY;
