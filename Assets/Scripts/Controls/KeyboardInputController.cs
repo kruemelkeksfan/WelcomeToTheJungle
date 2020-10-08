@@ -9,12 +9,14 @@ public class KeyboardInputController : MonoBehaviour
 	[SerializeField] private Weapon weapon = null;
 	private Text magazineIndicator = null;
 	private Text firemodeIndicator = null;
+	private uint id = 0;
 	private NetworkController network = null;
 
 	private void Start()
 	{
 		magazineIndicator = GameObject.Find("MagazineIndicator")?.GetComponentInChildren<Text>();
 		firemodeIndicator = GameObject.Find("FiremodeIndicator")?.GetComponentInChildren<Text>();
+		id = gameObject.GetComponentInChildren<NetworkObject>().ID;
 		network = NetworkController.instance;
 	}
 
@@ -26,7 +28,7 @@ public class KeyboardInputController : MonoBehaviour
 			Vector2 newMovement = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 			if(newMovement != movement.RotationInput || newRotation != movement.MovementInput)
 			{
-				network?.SendMovementUpdate(newRotation, newMovement);
+				network?.SendMovementUpdate(id, newRotation, newMovement);
 			}
 			movement.RotationInput = newRotation;
 			movement.MovementInput = newMovement;
@@ -34,22 +36,22 @@ public class KeyboardInputController : MonoBehaviour
 			if(Input.GetButtonDown("Sprint"))
 			{
 				movement.SprintInput = true;
-				network?.SendInput("SprintDown");
+				network?.SendInput(id, "SprintDown");
 			}
 			if(Input.GetButtonUp("Sprint"))
 			{
 				movement.SprintInput = false;
-				network?.SendInput("SprintUp");
+				network?.SendInput(id, "SprintUp");
 			}
 			if(Input.GetButtonDown("Jump"))
 			{
 				movement.JumpInput = true;
-				network?.SendInput("JumpDown");
+				network?.SendInput(id, "JumpDown");
 			}
 			if(Input.GetButtonUp("Jump"))
 			{
 				movement.JumpInput = false;
-				network?.SendInput("JumpUp");
+				network?.SendInput(id, "JumpUp");
 			}
 		}
 
@@ -58,32 +60,32 @@ public class KeyboardInputController : MonoBehaviour
 			if(Input.GetButtonDown("Fire"))
 			{
 				weapon.pullTrigger();
-				network?.SendInput("FireDown");
+				network?.SendInput(id, "FireDown");
 			}
 			if(Input.GetButtonUp("Fire"))
 			{
 				weapon.releaseTrigger();
-				network?.SendInput("FireUp");
+				network?.SendInput(id, "FireUp");
 			}
 			if(Input.GetButtonDown("Aim"))
 			{
 				weapon.aim();
-				network?.SendInput("AimDown");
+				network?.SendInput(id, "AimDown");
 			}
 			if(Input.GetButtonUp("Aim"))
 			{
 				weapon.unaim();
-				network?.SendInput("AimUp");
+				network?.SendInput(id, "AimUp");
 			}
 			if(Input.GetButtonDown("Reload"))
 			{
 				weapon.reload();
-				network?.SendInput("Reload");
+				network?.SendInput(id, "Reload");
 			}
 			if(Input.GetButtonDown("Firemode"))
 			{
 				weapon.switchFireMode();
-				network?.SendInput("Firemode");
+				network?.SendInput(id, "Firemode");
 			}
 		}
 

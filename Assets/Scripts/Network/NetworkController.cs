@@ -30,7 +30,6 @@ public class NetworkController : MonoBehaviour
 	private Dictionary<uint, NetworkObject> networkObjects = null;
 	private Dictionary<Tuple<string, uint>, Tuple<float, int>> unconfirmedInstantiations = null;
 	private Dictionary<string, GameObject> instantiationPrefabs = null;
-	private Dictionary<string, NetworkInputController> players = null;
 	private IEnumerator responseCoroutine = null;
 	private ErrorController error = null;
 
@@ -61,7 +60,6 @@ public class NetworkController : MonoBehaviour
 		networkObjects = new Dictionary<uint, NetworkObject>();
 		unconfirmedInstantiations = new Dictionary<Tuple<string, uint>, Tuple<float, int>>();
 		instantiationPrefabs = new Dictionary<string, GameObject>();
-		players = new Dictionary<string, NetworkInputController>();
 		error = GameObject.Find("ErrorPanel")?.GetComponentInChildren<ErrorController>();
 
 		Username = Dns.GetHostName();
@@ -109,19 +107,53 @@ public class NetworkController : MonoBehaviour
 			}
 			else if(IsClient && !IsHost && message.Length == 2 && message[0] == "Instantiate")
 			{
-				InstantiateFromString(message[1]);
-			}
-			else if(IsClient && !IsHost && message.Length == 3 && message[0] == "InstantiatePlayer")
-			{
-				GameObject player = InstantiateFromString(message[2]);
-				player.name = message[1];
-
-				if(message[1] == Username)
+				if(!IsHost)
 				{
-					player.GetComponentInChildren<Camera>().enabled = true;
-					player.GetComponentInChildren<AudioListener>().enabled = true;
-					player.GetComponentInChildren<KeyboardInputController>().enabled = true;
-					Chunk.AddPlayer(player.transform);
+					InstantiateFromString(message[1]);
+				}
+			}
+			else if(IsClient && message.Length == 3 && message[0] == "InstantiatePlayer")
+			{
+				if(!IsHost)
+				{
+					GameObject player = InstantiateFromString(message[2]);
+					player.name = message[1];
+
+					if(message[1] == Username)
+					{
+						player.GetComponentInChildren<Camera>().enabled = true;
+						player.GetComponentInChildren<AudioListener>().enabled = true;
+						player.GetComponentInChildren<KeyboardInputController>().enabled = true;
+						Chunk.AddPlayer(player.transform);
+					}
+				}
+			}
+			else if(IsClient && message.Length == 6 && message[0] == "MovementUpdate")
+			{
+				if(!IsHost)
+				{
+					uint id;
+					float rotationX;
+					float rotationY;
+					float movementX;
+					float movementY;
+					if(uint.TryParse(message[1], out id)
+						&& float.TryParse(message[2], out rotationX) && float.TryParse(message[3], out rotationY) && float.TryParse(message[4], out movementX) && float.TryParse(message[5], out movementY)
+						&& networkObjects.ContainsKey(id))
+					{
+						networkObjects[id].GetComponentInChildren<NetworkInputController>()?.UpdateMovement(rotationX, rotationY, movementX, movementY);
+					}
+				}
+			}
+			else if(IsClient && message.Length == 3 && message[1] == "Input")
+			{
+				if(!IsHost)
+				{
+					uint id;
+					if(uint.TryParse(message[1], out id) && networkObjects.ContainsKey(id))
+					{
+						networkObjects[id].GetComponentInChildren<NetworkInputController>()?.ProcessInput(message[2]);
+					}
 				}
 			}
 			else if(IsClient && message.Length == 14 && message[0] == "PositionUpdate")
@@ -146,7 +178,7 @@ public class NetworkController : MonoBehaviour
 					&& float.TryParse(message[11], out rotationVelocityX) && float.TryParse(message[12], out rotationVelocityY) && float.TryParse(message[13], out rotationVelocityZ)
 					&& networkObjects.ContainsKey(id) && networkObjects[id] is NetworkRigidbody)
 				{
-					((NetworkRigidbody) networkObjects[id]).UpdatePosition(positionX, positionY, positionZ, rotationX, rotationY, rotationZ, velocityX, velocityY, velocityZ, rotationVelocityX, rotationVelocityY, rotationVelocityZ);
+					((NetworkRigidbody)networkObjects[id]).UpdatePosition(positionX, positionY, positionZ, rotationX, rotationY, rotationZ, velocityX, velocityY, velocityZ, rotationVelocityX, rotationVelocityY, rotationVelocityZ);
 				}
 			}
 			// Host
@@ -181,7 +213,6 @@ public class NetworkController : MonoBehaviour
 					NetworkObject player = Instantiate(playerPrefab, spawnPoint, Quaternion.identity).GetComponent<NetworkObject>();
 					player.gameObject.name = message[0];
 					player.SetID();
-					players.Add(message[0], player.GetComponent<NetworkInputController>());
 					Chunk.AddPlayer(player.transform);
 					SendToClients("InstantiatePlayer " + message[0] + " " + GetInstantiationString(player));
 					unconfirmedInstantiations[new Tuple<string, uint>(message[0], player.ID)] = new Tuple<float, int>(Time.time, GetInstantiationHash(player));
@@ -207,20 +238,31 @@ public class NetworkController : MonoBehaviour
 					}
 				}
 			}
-			else if(IsHost && message.Length == 6 && message[1] == "MovementUpdate")	// TODO: Send and receive MovementUpdate to/on all Clients
+			else if(IsHost && message.Length == 7 && message[1] == "MovementUpdate")
 			{
+				uint id;
 				float rotationX;
 				float rotationY;
 				float movementX;
 				float movementY;
-				if(float.TryParse(message[2], out rotationX) && float.TryParse(message[3], out rotationY) && float.TryParse(message[4], out movementX) && float.TryParse(message[5], out movementY))
+				if(uint.TryParse(message[2], out id)
+					&& float.TryParse(message[3], out rotationX) && float.TryParse(message[4], out rotationY) && float.TryParse(message[5], out movementX) && float.TryParse(message[6], out movementY)
+					&& networkObjects.ContainsKey(id))
 				{
-					players[message[0]].UpdateMovement(rotationX, rotationY, movementX, movementY);
+					networkObjects[id].GetComponentInChildren<NetworkInputController>()?.UpdateMovement(rotationX, rotationY, movementX, movementY);
 				}
+
+				SendToClients("MovementUpdate " + message[2] + " " + message[3] + " " + message[4] + " " + message[5] + " " + message[6]);
 			}
-			else if(IsHost && message.Length == 3 && message[1] == "Input")
+			else if(IsHost && message.Length == 4 && message[1] == "Input")
 			{
-				players[message[0]].ProcessInput(message[2]);
+				uint id;
+				if(uint.TryParse(message[2], out id) && networkObjects.ContainsKey(id))
+				{
+					networkObjects[id].GetComponentInChildren<NetworkInputController>()?.ProcessInput(message[3]);
+				}
+
+				SendToClients("Input " + message[2] + " " + message[3]);
 			}
 			else
 			{
@@ -257,19 +299,19 @@ public class NetworkController : MonoBehaviour
 		}
 	}
 
-	public void SendMovementUpdate(Vector2 rotation, Vector2 movement)
+	public void SendMovementUpdate(uint id, Vector2 rotation, Vector2 movement)
 	{
 		if(!IsHost)
 		{
-			SendToHost(Username, "MovementUpdate " + rotation.x + " " + rotation.y + " " + movement.x + " " + movement.y);
+			SendToHost(Username, "MovementUpdate " + id + " " + rotation.x + " " + rotation.y + " " + movement.x + " " + movement.y);
 		}
 	}
 
-	public void SendInput(string input)
+	public void SendInput(uint id, string input)
 	{
 		if(!IsHost)
 		{
-			SendToHost(Username, "Input " + input);
+			SendToHost(Username, "Input " + id + " " + input);
 		}
 	}
 
