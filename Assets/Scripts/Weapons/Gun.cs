@@ -21,22 +21,21 @@ public class Gun : Weapon
 	[SerializeField] private float reloadTime = 2.0f;
 	[Tooltip("A Modifier which is applied at the Muzzle Energy of each Bullet and should mainly depend on Barrel Length and Action Type")]
 	[SerializeField] private float muzzleEnergyModifier = 1.0f;
-	[Tooltip("The initial Velocity of ejected Casings")]
-	[SerializeField] private Vector3 casingVelocity = Vector3.right;
-	[Tooltip("Determines how erratic Casings are ejected, a Value of 0.0 means, that every casing is ejected with the same Velocity")]
-	[SerializeField] private float casingDeviation = 2.0f;
+	[SerializeField] private Transform[] arms = null;
+	[SerializeField] private Vector3[] armHorizontalAxes = null;
+	[SerializeField] private Vector3[] armVerticalAxes = null;
 	[SerializeField] private Vector3 aimPosition = Vector3.zero;
 	[Tooltip("A GameObject which has its Center at the Muzzle Point of the Weapon to determine where Bullets will be spawned")]
 	[SerializeField] private Transform muzzle = null;
-	[Tooltip("A GameObject which has its Center at the Ejection Port of the Weapon to determine where ejected Casings will be spawned")]
-	[SerializeField] private Transform ejectionPort = null;
 	[Tooltip("Available Burst Counts, the first Element is the default Firemode, 0 means full-auto")]
 	[SerializeField] private int[] fireModes = { 0, 3, 1 };
 	[SerializeField] private GameObject bulletPrefab = null;
-	[SerializeField] private GameObject casingPrefab = null;
 	[SerializeField] private AudioClip fireSound = null;
+	[SerializeField] private ParticleSystem muzzleFlash = null;
+	[SerializeField] private ParticleSystem muzzleSmoke = null;
+	[SerializeField] private ParticleSystem casingEjection = null;
 	private Vector3 hipPosition = Vector3.zero;
-	private Quaternion originalRotation = Quaternion.identity;
+	private Quaternion[] originalRotations = null;
 	private float roundsPerMinuteMod = 1.0f;
 	private float timePerRound = 1.0f;
 	private float lastShot = 0.0f;
@@ -52,7 +51,6 @@ public class Gun : Weapon
 	private bool safety = false;
 	private bool disengageSafety = false;
 	private PoolManager bulletPoolManager = null;
-	private PoolManager casingPoolManager = null;
 
 	public float Damage
 	{
@@ -184,13 +182,17 @@ public class Gun : Weapon
 
 	private void Start()
 	{
-		originalRotation = transform.localRotation;
+		originalRotations = new Quaternion[arms.Length];
+		for(int i = 0; i < arms.Length; ++i)
+		{
+			originalRotations[i] = arms[i].localRotation;
+		}
+
 		timePerRound = 1.0f / ((RoundsPerMinute * RoundsPerMinuteMod) / 60.0f);
 		hipPosition = transform.localPosition;
 		audioSource = gameObject.GetComponent<AudioSource>();
 		rigidbody = transform.root.gameObject.GetComponentInChildren<Rigidbody>();
 		bulletPoolManager = new PoolManager();
-		casingPoolManager = new PoolManager();
 	}
 
 	private void FixedUpdate()
@@ -208,6 +210,7 @@ public class Gun : Weapon
 			shotCount = Mathf.RoundToInt(MagazineCapacity * MagazineCapacityMod);
 		}
 
+		// TODO: Do-While here to enable high RPM with low FPS
 		if(!safety && reloadStarted < 0 && (Time.time - lastShot) >= timePerRound && shotCount > 0)
 		{
 			ReadyToFire = true;
@@ -238,18 +241,10 @@ public class Gun : Weapon
 			float recoilStrength = recoilImpulse.magnitude;
 			verticalAccumulatedRecoil += VerticalRecoil * RecoilMod * recoilStrength * Random.Range(0.0f, 1.0f);
 			horizontalAccumulatedRecoil += HorizontalRecoil * RecoilMod * recoilStrength * Random.Range(-1.0f, 1.0f);
-			transform.localRotation *= Quaternion.AngleAxis(verticalAccumulatedRecoil, Vector3.left);
-			transform.localRotation *= Quaternion.AngleAxis(horizontalAccumulatedRecoil, Vector3.up);
-
-			// Eject Casing
-			if(ejectionPort != null && casingPrefab != null)
+			for(int i = 0; i < arms.Length; ++i)
 			{
-				SimpleRigidbody casing = (SimpleRigidbody) casingPoolManager.getPoolObject(casingPrefab, ejectionPort.position, ejectionPort.rotation, typeof(SimpleRigidbody));
-				casing.Velocity = ejectionPort.rotation * (casingVelocity + (Random.insideUnitSphere * casingDeviation));
-				if(rigidbody != null)
-				{
-					casing.Velocity += rigidbody.velocity;
-				}
+				arms[i].localRotation *= Quaternion.AngleAxis(verticalAccumulatedRecoil, armVerticalAxes[i]);
+				arms[i].localRotation *= Quaternion.AngleAxis(horizontalAccumulatedRecoil, armHorizontalAxes[i]);
 			}
 
 			// Firemode Limitations
@@ -264,16 +259,33 @@ public class Gun : Weapon
 				audioSource.clip = fireSound;
 				audioSource.Play();
 			}
+
+			// Firing Particles
+			if(muzzleFlash != null)
+			{
+				muzzleFlash.Play();
+			}
+			if(muzzleSmoke != null)
+			{
+				muzzleSmoke.Play();
+			}
+			if(casingEjection != null)
+			{
+				casingEjection.Play();
+			}
 		}
 
 		// Recenter Weapon
 		verticalAccumulatedRecoil -= verticalAccumulatedRecoil * (recoilResetFactor * Time.deltaTime);
 		horizontalAccumulatedRecoil -= horizontalAccumulatedRecoil * (recoilResetFactor * Time.deltaTime);
-		float recoilAngle = Quaternion.Angle(transform.localRotation, originalRotation);
-		transform.localRotation = Quaternion.RotateTowards(transform.localRotation, originalRotation, recoilAngle * recoilResetFactor * Time.deltaTime);
+		for(int i = 0; i < arms.Length; ++i)
+		{
+			float recoilAngle = Quaternion.Angle(arms[i].localRotation, originalRotations[i]);
+			arms[i].localRotation = Quaternion.RotateTowards(arms[i].localRotation, originalRotations[i], recoilAngle * recoilResetFactor * Time.deltaTime);
+		}
 
 		// Toggle Safety
-		// Complex Checking with multiple Variables to avoid firing Shots in the Frame in which the Safety is toggled
+		// Complex Checking with multiple Variables to avoid firing Shots in the Frame in which the Safety is toggled off
 		if(disengageSafety)
 		{
 			safety = false;

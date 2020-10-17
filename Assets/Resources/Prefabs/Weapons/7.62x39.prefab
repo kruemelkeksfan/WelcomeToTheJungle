@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7233165075245324377}
   - component: {fileID: -5253833941093612320}
   m_Layer: 0
-  m_Name: HK MPK Bullet
+  m_Name: 7.62x39
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,11 +45,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87177231a60e21b4190b1a017098c37e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1
+  mass: 0.008
   gravity: 9.81
-  drag: 0.02
-  bounciness: 0.5
-  lifetime: 10
+  drag: 0.000004
+  bounciness: 0.4
+  lifetime: 20
 --- !u!114 &7233165075245324377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64,15 +64,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetMask:
     serializedVersion: 2
-    m_Bits: 0
-  damage: 10
-  muzzleEnergy: 1
-  fragmentCountModifier: 1
-  fragmentSpeed: 4
-  tracer: {fileID: 0}
-  tracerLength: 20
-  fragmentPrefab: {fileID: 0}
-  hitSounds: []
+    m_Bits: 4294967295
+  damage: 4
+  muzzleEnergy: 2
+  tracer: {fileID: -5253833941093612320}
+  tracerLength: 3
 --- !u!120 &-5253833941093612320
 LineRenderer:
   m_ObjectHideFlags: 0

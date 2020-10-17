@@ -10,18 +10,13 @@ public class Bullet : PoolObject
 	[SerializeField] private int damage = 10;
 	[Tooltip("The Muzzle Energy of this Bullet, which is used to calculate the Muzzle Velocity by multiplying it by the Muzzle Energy Modifier of the Gun and dividing it by the Bullet Mass")]
 	[SerializeField] private float muzzleEnergy = 1.0f;
-	[SerializeField] private float fragmentCountModifier = 1.0f;
-	[SerializeField] private float fragmentSpeed = 4.0f;
 	[SerializeField] private LineRenderer tracer = null;
 	[SerializeField] private float tracerLength = 20.0f;
-	[SerializeField] private GameObject fragmentPrefab = null;
-	[SerializeField] private AudioClip[] hitSounds = null;
 	private Vector3 spawnPosition = Vector3.zero;
 	private Vector3 lastPosition = Vector3.zero;
 	private new SimpleRigidbody rigidbody = null;
 	private bool drawTracer = false;
 	private bool destroyed = false;
-	private PoolManager fragmentPoolManager = null;
 
 	public int Damage
 	{
@@ -40,7 +35,6 @@ public class Bullet : PoolObject
 	private void Awake()
 	{
 		rigidbody = gameObject.GetComponent<SimpleRigidbody>();
-		fragmentPoolManager = new PoolManager ();
 		init();
 	}
 
@@ -80,27 +74,8 @@ public class Bullet : PoolObject
 					target.GetDamage(impactDamage);
 				}*/
 
-				// Play Hit Sound
-				AudioSource audioSource = hit.collider.GetComponent<AudioSource>();
-				if(audioSource != null && hitSounds != null && hitSounds.Length > 0)
-				{
-					audioSource.PlayOneShot(hitSounds[Random.Range(0, hitSounds.Length - 1)]);
-				}
-
 				// Change Bullet Position to Impact Point
 				transform.position = hit.point;
-
-				// Spawn Fragments at Impact Point
-				travelledSegment = -travelledSegment.normalized;
-				if(impactDamage > 0.0f && fragmentPrefab != null)
-				{
-					int fragmentCount = Mathf.Max(Mathf.FloorToInt(impactDamage * fragmentCountModifier), 1);
-					for(int i = 0; i < fragmentCount; ++i)
-					{
-						// Spawn Fragment and set Speed
-						((SimpleRigidbody) fragmentPoolManager.getPoolObject(fragmentPrefab, transform.position, transform.rotation, typeof(SimpleRigidbody))).Velocity = (travelledSegment + Random.insideUnitSphere) * fragmentSpeed;
-					}
-				}
 
 				// Destroy Bullet
 				if(PoolManager != null)

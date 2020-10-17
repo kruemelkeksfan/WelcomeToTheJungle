@@ -7,9 +7,9 @@ public class SimpleRigidbody : PoolObject
 {
 	[SerializeField] private float mass = 1.0f;
 	[SerializeField] private float gravity = 9.81f;
-	[SerializeField] private float drag = 0.2f;
+	[SerializeField] private float drag = 0.000004f;
 	[Tooltip("How much Velocity is retained when this Object hits another Collider")]
-	[SerializeField] private float bounciness = 0.5f;
+	[SerializeField] private float bounciness = 0.4f;
 	[Tooltip("Time until from Spawn until automatic Destruction of this Object, 0 means unlimited")]
 	[SerializeField] private float lifetime = 10.0f;
 
@@ -76,9 +76,9 @@ public class SimpleRigidbody : PoolObject
 		{
 			Velocity = -Velocity * bounciness;
 		}
+		// If the SimpleRigidbody has more than 1 Second Lifetime left, accelerate its Demise
 		else if(sqrSpeed < 2.0f && (lifetime - (Time.time - spawnTime)) > 1.0f)
 		{
-			// If the SimpleRigidbody has more than 1 Second Lifetime left, accelerate its Demise
 			lifetime = (Time.time - spawnTime) + 1.0f;
 		}
 	}
