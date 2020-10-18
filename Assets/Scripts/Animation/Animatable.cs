@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Animatable : MonoBehaviour
 {
@@ -25,7 +23,7 @@ public class Animatable : MonoBehaviour
 		}
 	}
 
-	public void move(int target, float time)
+	public void Move(int target, float time)
 	{
 		if(target >= 0 && target < positions.Length && target < rotations.Length)
 		{
@@ -43,7 +41,7 @@ public class Animatable : MonoBehaviour
 		}
 	}
 
-	public void stopMovement()
+	public void StopMovement()
 	{
 		this.time = 0.0f;
 	}

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bullet : PoolObject
 {
@@ -35,12 +33,12 @@ public class Bullet : PoolObject
 	private void Awake()
 	{
 		rigidbody = gameObject.GetComponent<SimpleRigidbody>();
-		init();
+		Init();
 	}
 
-	public override void init()
+	public override void Init()
 	{
-		rigidbody.init();
+		rigidbody.Init();
 
 		spawnPosition = transform.position;
 		lastPosition = transform.position;
@@ -81,7 +79,7 @@ public class Bullet : PoolObject
 				if(PoolManager != null)
 				{
 					gameObject.SetActive(false);
-					PoolManager.returnPoolObject(this);
+					PoolManager.ReturnPoolObject(this);
 				}
 				else
 				{
@@ -102,11 +100,11 @@ public class Bullet : PoolObject
 		}
 	}
 
-	public Vector3 fireBullet(Vector3 gunVelocity, float spread, float muzzleEnergyModifier)
+	public Vector3 FireBullet(Vector3 gunVelocity, float spread, float muzzleEnergyModifier)
 	{
 		// Calculate and apply Bullet Impulse
 		Vector3 muzzleImpulse = (transform.forward + ((Random.insideUnitSphere * spread) / 10000.0f)).normalized * (muzzleEnergy * muzzleEnergyModifier);
-		rigidbody.applyImpulse(muzzleImpulse);
+		rigidbody.ApplyImpulse(muzzleImpulse);
 		rigidbody.Velocity += gunVelocity;
 
 		// Return Recoil

@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Rendering;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class Gun : Weapon
@@ -229,8 +226,8 @@ public class Gun : Weapon
 			++shotsFired;
 
 			// Fire Bullet
-			Bullet bullet = (Bullet) bulletPoolManager.getPoolObject(bulletPrefab, muzzle.position, muzzle.rotation, typeof(Bullet));
-			Vector3 recoilImpulse = bullet.fireBullet(rigidbody != null ? rigidbody.velocity : Vector3.zero, Spread * SpreadMod, MuzzleEnergyModifier * MuzzleEnergyModifierMod);
+			Bullet bullet = (Bullet)bulletPoolManager.GetPoolObject(bulletPrefab, muzzle.position, muzzle.rotation, typeof(Bullet));
+			Vector3 recoilImpulse = bullet.FireBullet(rigidbody != null ? rigidbody.velocity : Vector3.zero, Spread * SpreadMod, MuzzleEnergyModifier * MuzzleEnergyModifierMod);
 			bullet.DamageMod = Damage * DamageMod;
 
 			// Recoil
@@ -294,27 +291,27 @@ public class Gun : Weapon
 	}
 
 	// TODO: Remove and replace by actual Animation
-	public override void aim()
+	public override void Aim()
 	{
 		transform.localPosition = aimPosition;
 	}
-	public override void unaim()
+	public override void Unaim()
 	{
 		transform.localPosition = hipPosition;
 	}
 
-	public override void pullTrigger()
+	public override void PullTrigger()
 	{
 		fire = true;
 		shotsFired = 0;
 	}
 
-	public override void releaseTrigger()
+	public override void ReleaseTrigger()
 	{
 		fire = false;
 	}
 
-	public override void reload()
+	public override void Reload()
 	{
 		if(reloadStarted < 0)
 		{
@@ -323,7 +320,7 @@ public class Gun : Weapon
 		}
 	}
 
-	public override void switchFireMode(int fireMode = -1)
+	public override void SwitchFireMode(int fireMode = -1)
 	{
 		if(fireMode >= 0)
 		{
@@ -335,7 +332,7 @@ public class Gun : Weapon
 		}
 	}
 
-	public override void updateMagazineReadout(Text magazineIndicator)
+	public override void UpdateMagazineReadout(Text magazineIndicator)
 	{
 		if(magazineIndicator != null)
 		{
@@ -356,7 +353,7 @@ public class Gun : Weapon
 		}
 	}
 
-	public override void updateFiremodeReadout(Text firemodeIndicator)
+	public override void UpdateFiremodeReadout(Text firemodeIndicator)
 	{
 		if(firemodeIndicator != null)
 		{

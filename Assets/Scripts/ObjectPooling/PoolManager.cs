@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ public class PoolManager
 		pool = new Stack<PoolObject>();
 	}
 
-	public PoolObject getPoolObject(GameObject prefab, Vector3 position, Quaternion rotation, Type expectedType)
+	public PoolObject GetPoolObject(GameObject prefab, Vector3 position, Quaternion rotation, Type expectedType)
 	{
 		PoolObject poolObject = null;
 
@@ -31,7 +30,7 @@ public class PoolManager
 
 			poolObject.transform.position = position;
 			poolObject.transform.rotation = rotation;
-			poolObject.init();
+			poolObject.Init();
 		}
 		else
 		{
@@ -50,7 +49,7 @@ public class PoolManager
 		return poolObject;
 	}
 
-	public void returnPoolObject(PoolObject poolObject)
+	public void ReturnPoolObject(PoolObject poolObject)
 	{
 		pool.Push(poolObject);
 	}

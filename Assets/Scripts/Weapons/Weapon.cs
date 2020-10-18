@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class Weapon : MonoBehaviour
@@ -10,35 +8,35 @@ public class Weapon : MonoBehaviour
 		get; set;
 	}
 
-	public virtual void pullTrigger()
+	public virtual void PullTrigger()
 	{
 	}
 
-	public virtual void releaseTrigger()
+	public virtual void ReleaseTrigger()
 	{
 	}
 
-	public virtual void aim()
+	public virtual void Aim()
 	{
 	}
 
-	public virtual void unaim()
+	public virtual void Unaim()
 	{
 	}
 
-	public virtual void reload()
+	public virtual void Reload()
 	{
 	}
 
-	public virtual void switchFireMode(int firemode = -1)
+	public virtual void SwitchFireMode(int firemode = -1)
 	{
 	}
 
-	public virtual void updateMagazineReadout(Text magazineIndicator)
+	public virtual void UpdateMagazineReadout(Text magazineIndicator)
 	{
 	}
 
-	public virtual void updateFiremodeReadout(Text firemodeIndicator)
+	public virtual void UpdateFiremodeReadout(Text firemodeIndicator)
 	{
 	}
 }

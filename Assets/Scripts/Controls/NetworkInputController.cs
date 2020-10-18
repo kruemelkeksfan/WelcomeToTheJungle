@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class NetworkInputController : MonoBehaviour
 {
@@ -45,27 +42,27 @@ public class NetworkInputController : MonoBehaviour
 		{
 			if(input == "FireDown")
 			{
-				weapon.pullTrigger();
+				weapon.PullTrigger();
 			}
 			if(input == "FireUp")
 			{
-				weapon.releaseTrigger();
+				weapon.ReleaseTrigger();
 			}
 			if(input == "AimDown")
 			{
-				weapon.aim();
+				weapon.Aim();
 			}
 			if(input == "AimUp")
 			{
-				weapon.unaim();
+				weapon.Unaim();
 			}
 			if(input == "Reload")
 			{
-				weapon.reload();
+				weapon.Reload();
 			}
 			if(input == "Firemode")
 			{
-				weapon.switchFireMode();
+				weapon.SwitchFireMode();
 			}
 		}
 	}

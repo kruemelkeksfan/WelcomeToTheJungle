@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SimpleRigidbody : PoolObject
 {
@@ -30,10 +27,10 @@ public class SimpleRigidbody : PoolObject
 
 	private void Awake()
 	{
-		init();
+		Init();
 	}
 
-	public override void init()
+	public override void Init()
 	{
 		spawnTime = Time.time;
 		Velocity = Vector3.zero;
@@ -60,7 +57,7 @@ public class SimpleRigidbody : PoolObject
 			if(PoolManager != null)
 			{
 				gameObject.SetActive(false);
-				PoolManager.returnPoolObject(this);
+				PoolManager.ReturnPoolObject(this);
 			}
 			else
 			{
@@ -83,7 +80,7 @@ public class SimpleRigidbody : PoolObject
 		}
 	}
 
-	public void applyImpulse(Vector3 impulse)
+	public void ApplyImpulse(Vector3 impulse)
 	{
 		if(mass > 0.0f)
 		{

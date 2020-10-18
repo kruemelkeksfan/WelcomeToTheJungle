@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class KeyboardInputController : MonoBehaviour
@@ -62,43 +60,43 @@ public class KeyboardInputController : MonoBehaviour
 		{
 			if(Input.GetButtonDown("Fire"))
 			{
-				weapon.pullTrigger();
+				weapon.PullTrigger();
 				network?.SendInput(id, "FireDown");
 			}
 			if(Input.GetButtonUp("Fire"))
 			{
-				weapon.releaseTrigger();
+				weapon.ReleaseTrigger();
 				network?.SendInput(id, "FireUp");
 			}
 			if(Input.GetButtonDown("Aim"))
 			{
-				weapon.aim();
+				weapon.Aim();
 				network?.SendInput(id, "AimDown");
 			}
 			if(Input.GetButtonUp("Aim"))
 			{
-				weapon.unaim();
+				weapon.Unaim();
 				network?.SendInput(id, "AimUp");
 			}
 			if(Input.GetButtonDown("Reload"))
 			{
-				weapon.reload();
+				weapon.Reload();
 				network?.SendInput(id, "Reload");
 			}
 			if(Input.GetButtonDown("Firemode"))
 			{
-				weapon.switchFireMode();
+				weapon.SwitchFireMode();
 				network?.SendInput(id, "Firemode");
 			}
 		}
 
 		if(magazineIndicator != null)
 		{
-			weapon.updateMagazineReadout(magazineIndicator);
+			weapon.UpdateMagazineReadout(magazineIndicator);
 		}
 		if(firemodeIndicator != null)
 		{
-			weapon.updateFiremodeReadout(firemodeIndicator);
+			weapon.UpdateFiremodeReadout(firemodeIndicator);
 		}
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class MovementController : MonoBehaviour
@@ -34,7 +33,6 @@ public class MovementController : MonoBehaviour
 	private Rigidbody parentRigidbody = null;
 	private List<ContactPoint> contactList = null;
 	private bool grounded = false;
-	private Dictionary<Vector3, Vector3> groundSlopes = null;
 	private Vector3 slope = Vector3.zero;
 	private float lastJump = 0.0f;
 	private float jumpCharge = 0.0f;
@@ -43,18 +41,17 @@ public class MovementController : MonoBehaviour
 	private float stepTime = 0.0f;
 	private Vector3 stepForward = Vector3.forward;
 	private float stepDelay = 0.2f;
-	private bool mouseVisible = false;
 
 	public Vector2 RotationInput { get; set; } = Vector2.zero;
 	public Vector2 MovementInput { get; set; } = Vector2.zero;
 	public bool SprintInput { get; set; } = false;
 	public bool JumpInput { get; set; } = false;
+	public bool MouseVisible { get; set; } = false;
 
 	private void Start()
 	{
 		rigidbody = gameObject.GetComponent<Rigidbody>();
 		contactList = new List<ContactPoint>(64);
-		groundSlopes = new Dictionary<Vector3, Vector3>();
 		float miny = transform.position.y;
 		foreach(Collider foot in feet)
 		{
@@ -84,7 +81,7 @@ public class MovementController : MonoBehaviour
 	//		Therefore only use GetAxis() and GetButton() in FixedUpdate() and buffer everything else in an Update() Call.
 	private void FixedUpdate()
 	{
-		if(!mouseVisible)
+		if(!MouseVisible)
 		{
 			Cursor.lockState = CursorLockMode.Locked;
 
@@ -169,12 +166,12 @@ public class MovementController : MonoBehaviour
 			}
 
 			// Calculate Acceleration
-			movementVelocityChange = calculateAcceleration(((direction * speed) - rigidbody.velocity), acceleration);
+			movementVelocityChange = CalculateAcceleration(((direction * speed) - rigidbody.velocity), acceleration);
 		}
 		// Calculate Traction
 		if(parentRigidbody != null)
 		{
-			tractionVelocityChange = calculateAcceleration(parentRigidbody.velocity - rigidbody.velocity, tractionAcceleration);
+			tractionVelocityChange = CalculateAcceleration(parentRigidbody.velocity - rigidbody.velocity, tractionAcceleration);
 		}
 		//Apply Movement
 		rigidbody.AddForce(movementVelocityChange + tractionVelocityChange, ForceMode.VelocityChange);
@@ -232,13 +229,13 @@ public class MovementController : MonoBehaviour
 	// Step up if Step is low enough
 	private void OnCollisionEnter(Collision collision)
 	{
-		stepUp(collision);
+		StepUp(collision);
 	}
 
 	// Only get grounded, when you stay longer than 1 Frame on a Collider
 	private void OnCollisionStay(Collision collision)
 	{
-		stepUp(collision);
+		StepUp(collision);
 
 		// TODO: Maybe just check for Y-Component of Collision Normals?
 		if(!grounded)
@@ -274,7 +271,7 @@ public class MovementController : MonoBehaviour
 		}
 	}
 
-	private Vector3 calculateAcceleration(Vector3 targetVelocity, float acceleration)
+	private Vector3 CalculateAcceleration(Vector3 targetVelocity, float acceleration)
 	{
 		float changeSqrMagnitude = targetVelocity.sqrMagnitude;
 		if(changeSqrMagnitude > Mathf.Pow(acceleration * Time.deltaTime, 2.0f))
@@ -285,7 +282,7 @@ public class MovementController : MonoBehaviour
 		return targetVelocity;
 	}
 
-	private void stepUp(Collision collision)
+	private void StepUp(Collision collision)
 	{
 		if(MovementInput != Vector2.zero)
 		{
@@ -340,12 +337,6 @@ public class MovementController : MonoBehaviour
 				}
 			}
 		}
-	}
-
-	// TODO: Change to Property
-	public void setMouseVisible(bool mouseVisible)
-	{
-		this.mouseVisible = mouseVisible;
 	}
 }
 

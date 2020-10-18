@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using UnityEngine;
 
 public class Animator : MonoBehaviour
@@ -84,7 +82,7 @@ public class Animator : MonoBehaviour
 						int position = 0;
 						if(int.TryParse(argument, out position))
 						{
-							animatables[partid].move(position, time);
+							animatables[partid].Move(position, time);
 						}
 						else
 						{
@@ -121,8 +119,8 @@ public class Animator : MonoBehaviour
 
 			foreach(Animatable animatable in animatables)
 			{
-				animatable.stopMovement();
+				animatable.StopMovement();
 			}
-		}	
+		}
 	}
 }
