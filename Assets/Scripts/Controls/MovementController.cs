@@ -29,6 +29,8 @@ public class MovementController : MonoBehaviour
 	[SerializeField] private Collider[] feet = null;
 	[SerializeField] private Animator standAnimator = null;
 	[SerializeField] private Animator walkAnimator = null;
+	[SerializeField] private Animator aimAnimator = null;
+	[SerializeField] private Animator unaimAnimator = null;
 	private new Rigidbody rigidbody = null;
 	private Rigidbody parentRigidbody = null;
 	private List<ContactPoint> contactList = null;
@@ -95,7 +97,6 @@ public class MovementController : MonoBehaviour
 
 			rotation.x += -RotationInput.y * rotationSpeed * Time.deltaTime;
 			rotation.y += RotationInput.x * rotationSpeed * Time.deltaTime;
-			rotation.z = 0.0f;
 
 			if(rotation.x < 180 && rotation.x > maxLookDown)
 			{
@@ -108,8 +109,10 @@ public class MovementController : MonoBehaviour
 
 			if(head != null)
 			{
-				head.transform.localRotation = Quaternion.Euler(new Vector3(rotation.x, 0.0f, 0.0f));
-				transform.localRotation = Quaternion.Euler(new Vector3(0.0f, rotation.y, 0.0f));
+				Vector3 oldHeadRotation = head.transform.localRotation.eulerAngles;
+				Vector3 oldRotation = transform.localRotation.eulerAngles;
+				head.transform.localRotation = Quaternion.Euler(new Vector3(rotation.x, oldHeadRotation.y, oldHeadRotation.z));
+				transform.localRotation = Quaternion.Euler(new Vector3(oldRotation.x, rotation.y, oldRotation.z));
 			}
 			else
 			{
@@ -268,6 +271,22 @@ public class MovementController : MonoBehaviour
 		if(collision.rigidbody == parentRigidbody)
 		{
 			parentRigidbody = null;
+		}
+	}
+
+	public virtual void Aim()
+	{
+		if(aimAnimator != null)
+		{
+			aimAnimator.StartAnimation();
+		}
+	}
+
+	public virtual void Unaim()
+	{
+		if(unaimAnimator != null)
+		{
+			unaimAnimator.StartAnimation();
 		}
 	}
 

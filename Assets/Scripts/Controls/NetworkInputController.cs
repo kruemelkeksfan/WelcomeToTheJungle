@@ -36,6 +36,14 @@ public class NetworkInputController : MonoBehaviour
 			{
 				movement.JumpInput = false;
 			}
+			if(input == "AimDown")
+			{
+				movement.Aim();
+			}
+			if(input == "AimUp")
+			{
+				movement.Unaim();
+			}
 		}
 
 		if(weapon != null)
@@ -47,14 +55,6 @@ public class NetworkInputController : MonoBehaviour
 			if(input == "FireUp")
 			{
 				weapon.ReleaseTrigger();
-			}
-			if(input == "AimDown")
-			{
-				weapon.Aim();
-			}
-			if(input == "AimUp")
-			{
-				weapon.Unaim();
 			}
 			if(input == "Reload")
 			{

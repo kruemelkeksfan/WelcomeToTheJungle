@@ -21,7 +21,6 @@ public class Gun : Weapon
 	[SerializeField] private Transform[] arms = null;
 	[SerializeField] private Vector3[] armHorizontalAxes = null;
 	[SerializeField] private Vector3[] armVerticalAxes = null;
-	[SerializeField] private Vector3 aimPosition = Vector3.zero;
 	[Tooltip("A GameObject which has its Center at the Muzzle Point of the Weapon to determine where Bullets will be spawned")]
 	[SerializeField] private Transform muzzle = null;
 	[Tooltip("Available Burst Counts, the first Element is the default Firemode, 0 means full-auto")]
@@ -31,7 +30,6 @@ public class Gun : Weapon
 	[SerializeField] private ParticleSystem muzzleFlash = null;
 	[SerializeField] private ParticleSystem muzzleSmoke = null;
 	[SerializeField] private ParticleSystem casingEjection = null;
-	private Vector3 hipPosition = Vector3.zero;
 	private Quaternion[] originalRotations = null;
 	private float roundsPerMinuteMod = 1.0f;
 	private float timePerRound = 1.0f;
@@ -186,7 +184,6 @@ public class Gun : Weapon
 		}
 
 		timePerRound = 1.0f / ((RoundsPerMinute * RoundsPerMinuteMod) / 60.0f);
-		hipPosition = transform.localPosition;
 		audioSource = gameObject.GetComponent<AudioSource>();
 		rigidbody = transform.root.gameObject.GetComponentInChildren<Rigidbody>();
 		bulletPoolManager = new PoolManager();
@@ -288,16 +285,6 @@ public class Gun : Weapon
 			safety = false;
 			disengageSafety = false;
 		}
-	}
-
-	// TODO: Remove and replace by actual Animation
-	public override void Aim()
-	{
-		transform.localPosition = aimPosition;
-	}
-	public override void Unaim()
-	{
-		transform.localPosition = hipPosition;
 	}
 
 	public override void PullTrigger()

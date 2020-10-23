@@ -16,14 +16,6 @@ public class Weapon : MonoBehaviour
 	{
 	}
 
-	public virtual void Aim()
-	{
-	}
-
-	public virtual void Unaim()
-	{
-	}
-
 	public virtual void Reload()
 	{
 	}

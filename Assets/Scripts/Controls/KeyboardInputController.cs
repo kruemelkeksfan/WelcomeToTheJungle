@@ -54,6 +54,16 @@ public class KeyboardInputController : MonoBehaviour
 				movement.JumpInput = false;
 				network?.SendInput(id, "JumpUp");
 			}
+			if(Input.GetButtonDown("Aim"))
+			{
+				movement.Aim();
+				network?.SendInput(id, "AimDown");
+			}
+			if(Input.GetButtonUp("Aim"))
+			{
+				movement.Unaim();
+				network?.SendInput(id, "AimUp");
+			}
 		}
 
 		if(weapon != null)
@@ -67,16 +77,6 @@ public class KeyboardInputController : MonoBehaviour
 			{
 				weapon.ReleaseTrigger();
 				network?.SendInput(id, "FireUp");
-			}
-			if(Input.GetButtonDown("Aim"))
-			{
-				weapon.Aim();
-				network?.SendInput(id, "AimDown");
-			}
-			if(Input.GetButtonUp("Aim"))
-			{
-				weapon.Unaim();
-				network?.SendInput(id, "AimUp");
 			}
 			if(Input.GetButtonDown("Reload"))
 			{
