@@ -225,7 +225,12 @@ PrefabInstance:
     - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}
       propertyPath: horizontalRecoil
-      value: 0.08
+      value: 0.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
+        type: 3}
+      propertyPath: recoilResetFactor
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7263786313529615112, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}
