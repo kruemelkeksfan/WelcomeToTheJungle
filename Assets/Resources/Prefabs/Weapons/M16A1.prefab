@@ -213,24 +213,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}
-      propertyPath: bulletPrefab
-      value: 
-      objectReference: {fileID: 6748685144120150169, guid: 529e38c51b875b741b51616f2149eb54,
-        type: 3}
-    - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
-        type: 3}
-      propertyPath: verticalRecoil
-      value: 0.08
-      objectReference: {fileID: 0}
-    - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
-        type: 3}
-      propertyPath: horizontalRecoil
-      value: 0.16
-      objectReference: {fileID: 0}
-    - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
-        type: 3}
-      propertyPath: recoilResetFactor
-      value: 2
+      propertyPath: roundsPerMinute
+      value: 600
       objectReference: {fileID: 0}
     - target: {fileID: 7263786313529615112, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}

@@ -27,9 +27,7 @@ public class Gun : Weapon
 	[SerializeField] private int[] fireModes = { 0, 3, 1 };
 	[SerializeField] private GameObject bulletPrefab = null;
 	[SerializeField] private AudioClip fireSound = null;
-	[SerializeField] private ParticleSystem muzzleFlash = null;
-	[SerializeField] private ParticleSystem muzzleSmoke = null;
-	[SerializeField] private ParticleSystem casingEjection = null;
+	[SerializeField] private ParticleSystem[] firingParticles = null;
 	private Quaternion[] originalRotations = null;
 	private float roundsPerMinuteMod = 1.0f;
 	private float timePerRound = 1.0f;
@@ -248,24 +246,18 @@ public class Gun : Weapon
 			}
 
 			// Fire Sound
-			if(fireSound != null)
+			if(audioSource != null && fireSound != null)
 			{
-				audioSource.clip = fireSound;
-				audioSource.Play();
+				audioSource.PlayOneShot(fireSound);
 			}
 
 			// Firing Particles
-			if(muzzleFlash != null)
+			if(firingParticles != null)
 			{
-				muzzleFlash.Play();
-			}
-			if(muzzleSmoke != null)
-			{
-				muzzleSmoke.Play();
-			}
-			if(casingEjection != null)
-			{
-				casingEjection.Play();
+				foreach(ParticleSystem firingParticleSystem in firingParticles)
+				{
+					firingParticleSystem.Play();
+				}
 			}
 		}
 

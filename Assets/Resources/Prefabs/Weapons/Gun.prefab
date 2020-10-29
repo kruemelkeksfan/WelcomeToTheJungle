@@ -144,9 +144,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 2
   spread: 20
-  verticalRecoil: 0.4
-  horizontalRecoil: 0.2
-  recoilResetFactor: 1
+  verticalRecoil: 0.08
+  horizontalRecoil: 0.16
+  recoilResetFactor: 2
   roundsPerMinute: 600
   magazineCapacity: 20
   reloadTime: 3
@@ -160,15 +160,15 @@ MonoBehaviour:
   armVerticalAxes:
   - {x: 0, y: 0, z: -1}
   - {x: 1, y: 0, z: 0}
-  aimPosition: {x: 0, y: 0, z: 0}
   muzzle: {fileID: 322773121487836037}
   fireModes: 000000000300000001000000
-  bulletPrefab: {fileID: 6748685144120150169, guid: a4fca772351f6ab4095d5cb4678e3b3c,
+  bulletPrefab: {fileID: 6748685144120150169, guid: 529e38c51b875b741b51616f2149eb54,
     type: 3}
   fireSound: {fileID: 8300000, guid: a9b9a6772e334aa4383e70fb8233f03e, type: 3}
-  muzzleFlash: {fileID: 3101405338561889088}
-  muzzleSmoke: {fileID: 7683332568897076683}
-  casingEjection: {fileID: 4687306836486855371}
+  firingParticles:
+  - {fileID: 3101405338561889088}
+  - {fileID: 7683332568897076683}
+  - {fileID: 4687306836486855371}
 --- !u!1 &8715965794775803308
 GameObject:
   m_ObjectHideFlags: 0

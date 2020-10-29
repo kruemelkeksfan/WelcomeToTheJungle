@@ -149,13 +149,19 @@ PrefabInstance:
     - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}
       propertyPath: verticalRecoil
-      value: 0.08
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}
       propertyPath: horizontalRecoil
-      value: 0.04
+      value: 0.02
       objectReference: {fileID: 0}
+    - target: {fileID: 7216499207487600204, guid: b1723c84e04cf654cb2e607ba45e9a7b,
+        type: 3}
+      propertyPath: bulletPrefab
+      value: 
+      objectReference: {fileID: 6748685144120150169, guid: a4fca772351f6ab4095d5cb4678e3b3c,
+        type: 3}
     - target: {fileID: 7263786313529615112, guid: b1723c84e04cf654cb2e607ba45e9a7b,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -239,4 +245,3 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1304366415337560506}
   m_PrefabAsset: {fileID: 0}
-
