@@ -64,6 +64,16 @@ public class KeyboardInputController : MonoBehaviour
 				movement.Unaim();
 				network?.SendInput(id, "AimUp");
 			}
+			if(Input.GetButtonUp("Crouch"))
+			{
+				movement.Stance = 1;
+				network?.SendInput(id, "Crouch");
+			}
+			if(Input.GetButtonUp("Crawl"))
+			{
+				movement.Stance = 2;
+				network?.SendInput(id, "Crawl");
+			}
 		}
 
 		if(weapon != null)

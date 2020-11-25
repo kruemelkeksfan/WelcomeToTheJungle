@@ -48,6 +48,7 @@ public class Animator : MonoBehaviour
 					}
 				}
 
+				// TODO: Do not parse during Runtime
 				int separator = animation[lineIndex].IndexOf(" ");
 				string keyword = animation[lineIndex].Substring(0, separator);
 				string argument = animation[lineIndex].Substring(separator + 1);
@@ -100,6 +101,7 @@ public class Animator : MonoBehaviour
 		}
 	}
 
+	// Do not forget to stop a started Animation before starting another Animation on the same Animatables
 	public void StartAnimation()
 	{
 		if(!running)

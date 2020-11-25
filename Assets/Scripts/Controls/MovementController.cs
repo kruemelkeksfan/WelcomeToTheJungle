@@ -3,10 +3,10 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-	[Tooltip("Maximum look down Angle, Front is 0/360 Degrees, straight down 90/360 Degrees")]
+	[Tooltip("Maximum look down Angle, Front is 0 Degrees, straight down 90 Degrees")]
 	[SerializeField] private float maxLookDown = 90.0f;
-	[Tooltip("Maximum look up Angle, Front is 0/360 Degrees, straight up 270/360 Degrees")]
-	[SerializeField] private float maxLookUp = 270.0f;
+	[Tooltip("Maximum look up Angle, Front is 0 Degrees, straight up 90 Degrees")]
+	[SerializeField] private float maxLookUp = 90.0f;
 	[SerializeField] private float rotationSpeed = 400.0f;
 	[SerializeField] private float movementSpeed = 10.0f;
 	[SerializeField] private float movementAcceleration = 20.0f;
@@ -27,8 +27,14 @@ public class MovementController : MonoBehaviour
 	[SerializeField] private GrapplingHook grapplingHook = null;
 	[Tooltip("A Collider at the Position of the Players Feet, used to check whether the Player is grounded")]
 	[SerializeField] private Collider[] feet = null;
-	[SerializeField] private Animator standAnimator = null;
-	[SerializeField] private Animator walkAnimator = null;
+	[Tooltip("Array of the different Modifiers for the different available Stances, which affect Movement-Speed, -Acceleration and Rotation-Speed")]
+	[SerializeField] private float[] stanceModifiers = { 1.0f, 0.4f, 0.2f };
+	[Tooltip("Array of all possible Standing Stances of this Character, should have the same Length as stanceModifiers")]
+	[SerializeField] private Animator[] standAnimators = null;
+	[Tooltip("Array of all possible Movement Stances of this Character, should have the same Length as stanceModifiers")]
+	[SerializeField] private Animator[] moveAnimators = null;
+	[Tooltip("Optional Array of Head Positions for different Stances of this Character, Array should have the same Length as stanceModifiers if used, or Length 0 if unused")]
+	[SerializeField] private Animator[] headPositions = null;
 	[SerializeField] private Animator aimAnimator = null;
 	[SerializeField] private Animator unaimAnimator = null;
 	private new Rigidbody rigidbody = null;
@@ -38,6 +44,7 @@ public class MovementController : MonoBehaviour
 	private Vector3 slope = Vector3.zero;
 	private float lastJump = 0.0f;
 	private float jumpCharge = 0.0f;
+	private byte stance = 0;
 	private float feetDisplacement = 0.0f;
 	private float topDisplacement = 0.0f;
 	private float stepTime = 0.0f;
@@ -48,6 +55,38 @@ public class MovementController : MonoBehaviour
 	public Vector2 MovementInput { get; set; } = Vector2.zero;
 	public bool SprintInput { get; set; } = false;
 	public bool JumpInput { get; set; } = false;
+	public byte Stance
+	{
+		get
+		{
+			return stance;
+		}
+
+		set
+		{
+			standAnimators[stance].StopAnimation();
+			moveAnimators[stance].StopAnimation();
+
+			if(headPositions != null && headPositions.Length > 0)
+			{
+				headPositions[stance].StopAnimation();
+			}
+
+			if(stance == value)
+			{
+				stance = 0;
+			}
+			else
+			{
+				stance = value;
+			}
+
+			if(headPositions != null && headPositions.Length > 0)
+			{
+				headPositions[stance].StartAnimation();
+			}
+		}
+	}
 	public bool MouseVisible { get; set; } = false;
 
 	private void Start()
@@ -88,35 +127,35 @@ public class MovementController : MonoBehaviour
 			Cursor.lockState = CursorLockMode.Locked;
 
 			// Rotation
-			Vector3 rotation = transform.rotation.eulerAngles;
-
+			Vector2 dRotation = new Vector2(-RotationInput.y, RotationInput.x) * rotationSpeed * stanceModifiers[stance] * Time.deltaTime;
+			float oldX;
 			if(head != null)
 			{
-				rotation.x = head.transform.rotation.eulerAngles.x;
-			}
-
-			rotation.x += -RotationInput.y * rotationSpeed * Time.deltaTime;
-			rotation.y += RotationInput.x * rotationSpeed * Time.deltaTime;
-
-			if(rotation.x < 180 && rotation.x > maxLookDown)
-			{
-				rotation.x = maxLookDown;
-			}
-			else if(rotation.x > 180 && rotation.x < maxLookUp)
-			{
-				rotation.x = maxLookUp;
-			}
-
-			if(head != null)
-			{
-				Vector3 oldHeadRotation = head.transform.localRotation.eulerAngles;
-				Vector3 oldRotation = transform.localRotation.eulerAngles;
-				head.transform.localRotation = Quaternion.Euler(new Vector3(rotation.x, oldHeadRotation.y, oldHeadRotation.z));
-				transform.localRotation = Quaternion.Euler(new Vector3(oldRotation.x, rotation.y, oldRotation.z));
+				oldX = head.transform.rotation.eulerAngles.x;
 			}
 			else
 			{
-				transform.localRotation = Quaternion.Euler(rotation);
+				oldX = transform.rotation.eulerAngles.x;
+			}
+			float newX = oldX + dRotation.x;
+			newX = (newX < 0) ? (360.0f - (newX % 360.0f)) : (newX % 360.0f);
+			if(newX < 180 && newX > maxLookDown)
+			{
+				dRotation.x = maxLookDown - oldX;
+			}
+			else if(newX > 180 && newX < 360 - maxLookUp)
+			{
+				dRotation.x = (360.0f - maxLookUp) - oldX;
+			}
+
+			if(head != null)
+			{
+				head.transform.rotation = Quaternion.Euler(head.transform.rotation.eulerAngles + new Vector3(dRotation.x, 0.0f, 0.0f));
+				transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(0.0f, dRotation.y, 0.0f));
+			}
+			else
+			{
+				transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + new Vector3(dRotation.x, dRotation.y, 0.0f));
 			}
 		}
 		else
@@ -137,7 +176,7 @@ public class MovementController : MonoBehaviour
 			}
 
 			// Calculate Speed
-			float speed = movementSpeed;
+			float speed = movementSpeed * stanceModifiers[stance];
 			// Sprint Bonus
 			if(SprintInput && Vector3.Angle(transform.forward, direction) <= 45.0f)
 			{
@@ -154,7 +193,7 @@ public class MovementController : MonoBehaviour
 			}
 
 			// Calculate Acceleration
-			float acceleration = movementAcceleration;
+			float acceleration = movementAcceleration * stanceModifiers[stance];
 			// Ground and Grappling Bonus
 			if(!grounded)
 			{
@@ -180,17 +219,17 @@ public class MovementController : MonoBehaviour
 		rigidbody.AddForce(movementVelocityChange + tractionVelocityChange, ForceMode.VelocityChange);
 
 		// Walking Animation
-		if(standAnimator != null && walkAnimator != null)
+		if(standAnimators.Length > Stance && moveAnimators.Length > Stance)
 		{
 			if(direction != Vector3.zero)
 			{
-				standAnimator.StopAnimation();
-				walkAnimator.StartAnimation();
+				standAnimators[Stance].StopAnimation();
+				moveAnimators[Stance].StartAnimation();
 			}
 			else
 			{
-				walkAnimator.StopAnimation();
-				standAnimator.StartAnimation();
+				moveAnimators[Stance].StopAnimation();
+				standAnimators[Stance].StartAnimation();
 			}
 		}
 
@@ -206,7 +245,7 @@ public class MovementController : MonoBehaviour
 		}
 
 		// Jumping
-		if(JumpInput)
+		if(JumpInput && stance == 0)
 		{
 			if((Time.time - lastJump) >= jumpTime && grounded)
 			{
@@ -229,38 +268,45 @@ public class MovementController : MonoBehaviour
 		}
 	}
 
-	// Step up if Step is low enough
 	private void OnCollisionEnter(Collision collision)
 	{
+		// Step up if Step is low enough
 		StepUp(collision);
 	}
 
-	// Only get grounded, when you stay longer than 1 Frame on a Collider
 	private void OnCollisionStay(Collision collision)
 	{
+		// Step up if Step is low enough
 		StepUp(collision);
-
 		// TODO: Maybe just check for Y-Component of Collision Normals?
 		if(!grounded)
 		{
-			int contactCount = collision.GetContacts(contactList);
-			float maxMass = parentRigidbody != null ? parentRigidbody.mass : 0.0f;
-			for(int i = 0; i < contactCount; ++i)
+			if(stance == 0)
 			{
-				foreach(Collider foot in feet)
+				int contactCount = collision.GetContacts(contactList);
+				float maxMass = parentRigidbody != null ? parentRigidbody.mass : 0.0f;
+				for(int i = 0; i < contactCount; ++i)
 				{
-					if(contactList[i].thisCollider.Equals(foot))
+					// Get grounded, when you stay longer than 1 Frame on a Collider
+					foreach(Collider foot in feet)
 					{
-						grounded = true;
-						if(contactList[i].otherCollider.attachedRigidbody != null && contactList[i].otherCollider.attachedRigidbody.mass > maxMass)
+						if(contactList[i].thisCollider.Equals(foot))
 						{
-							parentRigidbody = contactList[i].otherCollider.attachedRigidbody;
-							maxMass = parentRigidbody.mass;
-						}
+							grounded = true;
+							if(contactList[i].otherCollider.attachedRigidbody != null && contactList[i].otherCollider.attachedRigidbody.mass > maxMass)
+							{
+								parentRigidbody = contactList[i].otherCollider.attachedRigidbody;
+								maxMass = parentRigidbody.mass;
+							}
 
-						break;
+							break;
+						}
 					}
 				}
+			}
+			else
+			{
+				grounded = true;
 			}
 		}
 	}
@@ -276,24 +322,26 @@ public class MovementController : MonoBehaviour
 
 	public virtual void Aim()
 	{
-		if(aimAnimator != null)
+		if(aimAnimator != null && unaimAnimator != null)
 		{
+			unaimAnimator.StopAnimation();
 			aimAnimator.StartAnimation();
 		}
 	}
 
 	public virtual void Unaim()
 	{
-		if(unaimAnimator != null)
+		if(aimAnimator != null && unaimAnimator != null)
 		{
+			aimAnimator.StopAnimation();
 			unaimAnimator.StartAnimation();
 		}
 	}
 
+	// TODO: Does not work with low Speeds, also this Method is ugly
 	private Vector3 CalculateAcceleration(Vector3 targetVelocity, float acceleration)
 	{
-		float changeSqrMagnitude = targetVelocity.sqrMagnitude;
-		if(changeSqrMagnitude > Mathf.Pow(acceleration * Time.deltaTime, 2.0f))
+		if(targetVelocity.sqrMagnitude > Mathf.Pow(acceleration * Time.deltaTime, 2.0f))
 		{
 			targetVelocity = targetVelocity.normalized * acceleration * Time.deltaTime;
 		}

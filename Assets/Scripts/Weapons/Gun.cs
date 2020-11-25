@@ -18,9 +18,7 @@ public class Gun : Weapon
 	[SerializeField] private float reloadTime = 2.0f;
 	[Tooltip("A Modifier which is applied at the Muzzle Energy of each Bullet and should mainly depend on Barrel Length and Action Type")]
 	[SerializeField] private float muzzleEnergyModifier = 1.0f;
-	[SerializeField] private Transform[] arms = null;
-	[SerializeField] private Vector3[] armHorizontalAxes = null;
-	[SerializeField] private Vector3[] armVerticalAxes = null;
+	[SerializeField] private Transform arms = null;
 	[Tooltip("A GameObject which has its Center at the Muzzle Point of the Weapon to determine where Bullets will be spawned")]
 	[SerializeField] private Transform muzzle = null;
 	[Tooltip("Available Burst Counts, the first Element is the default Firemode, 0 means full-auto")]
@@ -28,7 +26,7 @@ public class Gun : Weapon
 	[SerializeField] private GameObject bulletPrefab = null;
 	[SerializeField] private AudioClip fireSound = null;
 	[SerializeField] private ParticleSystem[] firingParticles = null;
-	private Quaternion[] originalRotations = null;
+	private Quaternion originalRotation = Quaternion.identity;
 	private float roundsPerMinuteMod = 1.0f;
 	private float timePerRound = 1.0f;
 	private float lastShot = 0.0f;
@@ -175,11 +173,7 @@ public class Gun : Weapon
 
 	private void Start()
 	{
-		originalRotations = new Quaternion[arms.Length];
-		for(int i = 0; i < arms.Length; ++i)
-		{
-			originalRotations[i] = arms[i].localRotation;
-		}
+		originalRotation = arms.localRotation;
 
 		timePerRound = 1.0f / ((RoundsPerMinute * RoundsPerMinuteMod) / 60.0f);
 		audioSource = gameObject.GetComponent<AudioSource>();
@@ -233,11 +227,9 @@ public class Gun : Weapon
 			float recoilStrength = recoilImpulse.magnitude;
 			verticalAccumulatedRecoil += VerticalRecoil * RecoilMod * recoilStrength * Random.Range(0.0f, 1.0f);
 			horizontalAccumulatedRecoil += HorizontalRecoil * RecoilMod * recoilStrength * Random.Range(-1.0f, 1.0f);
-			for(int i = 0; i < arms.Length; ++i)
-			{
-				arms[i].localRotation *= Quaternion.AngleAxis(verticalAccumulatedRecoil, armVerticalAxes[i]);
-				arms[i].localRotation *= Quaternion.AngleAxis(horizontalAccumulatedRecoil, armHorizontalAxes[i]);
-			}
+
+			arms.localRotation *= Quaternion.AngleAxis(verticalAccumulatedRecoil, Vector3.left);
+			arms.localRotation *= Quaternion.AngleAxis(horizontalAccumulatedRecoil, Vector3.up);
 
 			// Firemode Limitations
 			if(fireModes[fireMode] != 0 && shotsFired >= fireModes[fireMode])
@@ -264,11 +256,8 @@ public class Gun : Weapon
 		// Recenter Weapon
 		verticalAccumulatedRecoil -= verticalAccumulatedRecoil * (recoilResetFactor * Time.deltaTime);
 		horizontalAccumulatedRecoil -= horizontalAccumulatedRecoil * (recoilResetFactor * Time.deltaTime);
-		for(int i = 0; i < arms.Length; ++i)
-		{
-			float recoilAngle = Quaternion.Angle(arms[i].localRotation, originalRotations[i]);
-			arms[i].localRotation = Quaternion.RotateTowards(arms[i].localRotation, originalRotations[i], recoilAngle * recoilResetFactor * Time.deltaTime);
-		}
+		float recoilAngle = Quaternion.Angle(arms.localRotation, originalRotation);
+		arms.localRotation = Quaternion.RotateTowards(arms.localRotation, originalRotation, recoilAngle * recoilResetFactor * Time.deltaTime);
 
 		// Toggle Safety
 		// Complex Checking with multiple Variables to avoid firing Shots in the Frame in which the Safety is toggled off
