@@ -6,7 +6,7 @@ PhysicMaterial:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Feet
+  m_Name: Humanoid
   dynamicFriction: 0.02
   staticFriction: 0.02
   bounciness: 0

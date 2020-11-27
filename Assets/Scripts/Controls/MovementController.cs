@@ -27,7 +27,7 @@ public class MovementController : MonoBehaviour
 	[SerializeField] private GrapplingHook grapplingHook = null;
 	[Tooltip("A Collider at the Position of the Players Feet, used to check whether the Player is grounded")]
 	[SerializeField] private Collider[] feet = null;
-	[Tooltip("Array of the different Modifiers for the different available Stances, which affect Movement-Speed, -Acceleration and Rotation-Speed")]
+	[Tooltip("Array of the different Movement Speed Modifiers for the different available Stances")]
 	[SerializeField] private float[] stanceModifiers = { 1.0f, 0.4f, 0.2f };
 	[Tooltip("Array of all possible Standing Stances of this Character, should have the same Length as stanceModifiers")]
 	[SerializeField] private Animator[] standAnimators = null;
@@ -122,12 +122,12 @@ public class MovementController : MonoBehaviour
 	//		Therefore only use GetAxis() and GetButton() in FixedUpdate() and buffer everything else in an Update() Call.
 	private void FixedUpdate()
 	{
+		// Rotation
 		if(!MouseVisible)
 		{
 			Cursor.lockState = CursorLockMode.Locked;
 
-			// Rotation
-			Vector2 dRotation = new Vector2(-RotationInput.y, RotationInput.x) * rotationSpeed * stanceModifiers[stance] * Time.deltaTime;
+			Vector2 dRotation = new Vector2(-RotationInput.y, RotationInput.x) * rotationSpeed * Time.deltaTime;
 			float oldX;
 			if(head != null)
 			{
@@ -193,7 +193,7 @@ public class MovementController : MonoBehaviour
 			}
 
 			// Calculate Acceleration
-			float acceleration = movementAcceleration * stanceModifiers[stance];
+			float acceleration = movementAcceleration;
 			// Ground and Grappling Bonus
 			if(!grounded)
 			{
@@ -208,12 +208,12 @@ public class MovementController : MonoBehaviour
 			}
 
 			// Calculate Acceleration
-			movementVelocityChange = CalculateAcceleration(((direction * speed) - rigidbody.velocity), acceleration);
+			movementVelocityChange = CalculateAcceleratedVelocityChange(((direction * speed) - rigidbody.velocity), acceleration);
 		}
 		// Calculate Traction
 		if(parentRigidbody != null)
 		{
-			tractionVelocityChange = CalculateAcceleration(parentRigidbody.velocity - rigidbody.velocity, tractionAcceleration);
+			tractionVelocityChange = CalculateAcceleratedVelocityChange(parentRigidbody.velocity - rigidbody.velocity, tractionAcceleration);
 		}
 		//Apply Movement
 		rigidbody.AddForce(movementVelocityChange + tractionVelocityChange, ForceMode.VelocityChange);
@@ -338,13 +338,14 @@ public class MovementController : MonoBehaviour
 		}
 	}
 
-	// TODO: Does not work with low Speeds, also this Method is ugly
-	private Vector3 CalculateAcceleration(Vector3 targetVelocity, float acceleration)
+	private Vector3 CalculateAcceleratedVelocityChange(Vector3 targetVelocity, float acceleration)
 	{
 		if(targetVelocity.sqrMagnitude > Mathf.Pow(acceleration * Time.deltaTime, 2.0f))
 		{
 			targetVelocity = targetVelocity.normalized * acceleration * Time.deltaTime;
 		}
+
+		Debug.Log(acceleration * Time.deltaTime);
 
 		return targetVelocity;
 	}
