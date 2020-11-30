@@ -62,15 +62,12 @@ public class Bullet : PoolObject
 			// TODO: Check for Tag here, too
 			if(Physics.Raycast(lastPosition, travelledSegment, out hit, travelledSegment.magnitude, targetMask))
 			{
-				// Calculate Damage
-				int impactDamage = Mathf.CeilToInt(rigidbody.Mass * rigidbody.Velocity.magnitude * damage * DamageMod);
-
 				// Apply Damage
-				/*Hittable target = hit.collider.GetComponent<Hittable>();
+				Hittable target = hit.collider.GetComponentInParent<Hittable>();
 				if(target != null)
 				{
-					target.GetDamage(impactDamage);
-				}*/
+					target.Hit(hit.collider, hit.point, hit.normal, (rigidbody.Mass * rigidbody.Velocity.magnitude * damage * DamageMod));
+				}
 
 				// Change Bullet Position to Impact Point
 				transform.position = hit.point;

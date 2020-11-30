@@ -345,8 +345,6 @@ public class MovementController : MonoBehaviour
 			targetVelocity = targetVelocity.normalized * acceleration * Time.deltaTime;
 		}
 
-		Debug.Log(acceleration * Time.deltaTime);
-
 		return targetVelocity;
 	}
 

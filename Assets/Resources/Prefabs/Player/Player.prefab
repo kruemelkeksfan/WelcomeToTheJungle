@@ -734,10 +734,10 @@ MonoBehaviour:
   movementSpeed: 10
   movementAcceleration: 20
   sprintFactor: 2
-  jumpStrength: 2000
+  jumpStrength: 2200
   jumpTime: 0.2
-  minimumStepHeight: 0.02
-  maximumStepHeight: 1
+  minimumStepHeight: 0.002
+  maximumStepHeight: 0.2
   floatingMovementFactor: 0.002
   grappledMovementFactor: 0.5
   tractionAcceleration: 20
