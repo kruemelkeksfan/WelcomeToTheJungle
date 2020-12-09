@@ -321,7 +321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colliders:
   - {fileID: 7459254855091442444}
-  hardness: 0.4
+  hardness: 0.04
   hitSounds:
   - {fileID: 8300000, guid: c315e09d241f45642b05af7a1b26625d, type: 3}
   hitParticles:

@@ -262,7 +262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colliders:
   - {fileID: 554410544653353508}
-  hardness: 0.6
+  hardness: 0.1
   hitSounds:
   - {fileID: 8300000, guid: 437981ce712403c48a1c8ae4029f1aab, type: 3}
   - {fileID: 8300000, guid: 59ec8cc18be759643b25d36fd5054b61, type: 3}

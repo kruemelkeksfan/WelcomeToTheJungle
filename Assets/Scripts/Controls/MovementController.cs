@@ -37,6 +37,8 @@ public class MovementController : MonoBehaviour
 	[SerializeField] private Animator[] headPositions = null;
 	[SerializeField] private Animator aimAnimator = null;
 	[SerializeField] private Animator unaimAnimator = null;
+	[Tooltip("The Stance which should be assumed when a critical Part of Movement gets disabled")]
+	[SerializeField] private byte crawlStance = 3;
 	private new Rigidbody rigidbody = null;
 	private Rigidbody parentRigidbody = null;
 	private List<ContactPoint> contactList = null;
@@ -50,6 +52,7 @@ public class MovementController : MonoBehaviour
 	private float stepTime = 0.0f;
 	private Vector3 stepForward = Vector3.forward;
 	private float stepDelay = 0.2f;
+	private bool forceCrawl = false;
 
 	public Vector2 RotationInput { get; set; } = Vector2.zero;
 	public Vector2 MovementInput { get; set; } = Vector2.zero;
@@ -64,30 +67,47 @@ public class MovementController : MonoBehaviour
 
 		set
 		{
-			standAnimators[stance].StopAnimation();
-			moveAnimators[stance].StopAnimation();
+			if(!forceCrawl || value == crawlStance)
+			{
+				standAnimators[stance].StopAnimation();
+				moveAnimators[stance].StopAnimation();
 
-			if(headPositions != null && headPositions.Length > 0)
-			{
-				headPositions[stance].StopAnimation();
-			}
+				if(headPositions != null && headPositions.Length > 0)
+				{
+					headPositions[stance].StopAnimation();
+				}
 
-			if(stance == value)
-			{
-				stance = 0;
-			}
-			else
-			{
-				stance = value;
-			}
+				if(stance == value)
+				{
+					stance = 0;
+				}
+				else
+				{
+					stance = value;
+				}
 
-			if(headPositions != null && headPositions.Length > 0)
-			{
-				headPositions[stance].StartAnimation();
+				if(headPositions != null && headPositions.Length > 0)
+				{
+					headPositions[stance].StartAnimation();
+				}
 			}
 		}
 	}
 	public bool MouseVisible { get; set; } = false;
+	public float HealthMovementModifier { get; set; } = 1.0f;
+	public float HealthCrawlModifier { get; set; } = 1.0f;
+	public bool ForceCrawl
+	{
+		get
+		{
+			return forceCrawl;
+		}
+		set
+		{
+			forceCrawl = value;
+			Stance = crawlStance;
+		}
+	}
 
 	private void Start()
 	{
@@ -176,7 +196,7 @@ public class MovementController : MonoBehaviour
 			}
 
 			// Calculate Speed
-			float speed = movementSpeed * stanceModifiers[stance];
+			float speed = movementSpeed * stanceModifiers[stance] * (stance != crawlStance ? HealthMovementModifier : HealthCrawlModifier);
 			// Sprint Bonus
 			if(SprintInput && Vector3.Angle(transform.forward, direction) <= 45.0f)
 			{
