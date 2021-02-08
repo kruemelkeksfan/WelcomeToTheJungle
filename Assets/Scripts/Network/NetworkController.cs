@@ -15,6 +15,7 @@ public class NetworkController : MonoBehaviour
 	public const int MTU = 1400;
 	public const int OBJECTS_PER_PACKET = 6;
 	public static NetworkController instance = null;
+
 	[SerializeField] private float timeoutDuration = 2.0f;
 	[SerializeField] private GameObject playerPrefab = null;
 	[SerializeField] private Vector3 spawnPoint = Vector3.zero;
