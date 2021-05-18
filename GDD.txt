@@ -1,0 +1,50 @@
+Weapons modifiable
+	read dynamically
+		OBJ
+		Palette
+		Particle System Positions and Attributes
+		Weapon Stats
+	Then assemble the Objects/Prefabs from this Data instead of pre-built Prefabs
+	Same System for Equipment, Characters, Enemies, (player-built and Map-) Buildings, Maps
+Level System
+	Skill/Perk System (tba)
+	Chewing Gum
+		Players can choose a Type of Chewing Gum that provides bonus Stats
+		only 1 active at a Time
+		maybe Drawbacks, but rather not
+	Classes
+		Engineer
+			has Sandbags (and Aluminium Rods and Tent Fabric) which can be used to build Things
+				Sandsack Walls/Emplacements
+				Shelter Structure
+		Radio Operator
+			has a portable Radio
+				Speed Debuff while Carrying
+				can be set down to operate as stationary Radio and avoid Speed Debuff
+				e.g. set down Radio in Engineer built Shelter to get a Radio Bunker
+		Recon
+			Sniper
+			Speaks Vietnamese
+				Can get more Intel from NPCs
+		Machine Gunner
+			Has a Machine Gun
+				Speed Debuff while Carrying
+				Can be emplaced somewhere
+					e.g. in an Engineer-built Emplacement
+		Grenadier
+		Rifleman
+		Medic
+		Squad Leader
+Building System
+	everybody has a Shovel to dig Trenches (uff Trenches?! And then you want Craters, too, I guess?!)
+	People can outline their Blueprints/Plans, then Time will be sped up during Construction
+	Time will be reset to normal if Enemy Fire happens
+		explained by assigning a Guard during Construction, which would notice the Enemies and alert the builders
+Quest System
+	Quests with Purpose
+	Dont give Tasks the Player would do anyways (e.g. "kill Enemies") or which are simply trivial/boring/time-consuming
+	Possible Tasks
+		Destroy Radar/Supply Depot/Radio Station
+		Defend Point (see above: not boring or overly time-consuming, maybe think of cool Mechanics?)
+		Attack Point
+		Build Base (also needs some cool Mechanics to be fun a.k.a. actually a Reason to build a good Base)
