@@ -1,11 +1,25 @@
-Weapons modifiable
-	read dynamically
-		OBJ
-		Palette
-		Particle System Positions and Attributes
-		Weapon Stats
-	Then assemble the Objects/Prefabs from this Data instead of pre-built Prefabs
-	Same System for Equipment, Characters, Enemies, (player-built and Map-) Buildings, Maps
+Weapons
+	modifiable
+		read dynamically
+			OBJ
+			Palette
+			Particle System Positions and Attributes
+			Weapon Stats
+		Then assemble the Objects/Prefabs from this Data instead of pre-built Prefabs
+		Same System for Equipment, Characters, Enemies, (player-built and Map-) Buildings, Maps
+	Stocks foldable
+		Reduces Storage Space
+		Reduces Accuracy
+		Increases Recoil
+		Increases Accuracy after fast Turns/moving the Weapon
+			give Accuracy Debuff for all Movement of the Gun in the last Second
+				either make this 0.5 Seconds with Stock folded
+				or reduce Debuff Intensity
+	Weapon Sway
+		Recoil is already implemented
+		Inertness to be implemented: guns adjust to new position slowly
+		Random Sway as Shooter Skill Representation
+		Accuracy is represented by already implemented random bullet deviation
 Level System
 	Skill/Perk System (tba)
 	Chewing Gum
