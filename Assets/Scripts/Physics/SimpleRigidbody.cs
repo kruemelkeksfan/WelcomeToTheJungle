@@ -40,6 +40,7 @@ public class SimpleRigidbody : PoolObject
 
 	private void FixedUpdate()
 	{
+		// TODO: Do not use Time.deltaTime but Time.fixedDeltaTime in FixedUpdate()!
 		if(lifetime <= 0 || (Time.time - spawnTime < lifetime))
 		{
 			// Update Position
