@@ -44,13 +44,16 @@ public class SimpleRigidbody : PoolObject
 		if(lifetime <= 0 || (Time.time - spawnTime < lifetime))
 		{
 			// Update Position
+			// TODO: Use https://en.wikipedia.org/wiki/Midpoint_method
 			transform.position += Velocity * Time.deltaTime;
-
+			
 			// Apply Drag
 			Velocity *= 1.0f - Mathf.Min((Velocity.sqrMagnitude * drag * Time.deltaTime), 1.0f);
 
 			// Apply Gravity
 			Velocity += new Vector3(0.0f, -gravity * Time.deltaTime, 0.0f);
+			
+			// TODO: Apply Wind
 		}
 		else
 		{
