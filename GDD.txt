@@ -16,7 +16,7 @@ Weapons
 				either make this 0.5 Seconds with Stock folded
 				or reduce Debuff Intensity
 	Weapon Sway
-		Recoil is already implemented
+		Gun should move backwards on Recoil (nyi)
 		Inertness to be implemented: guns adjust to new position slowly
 		Random Sway as Shooter Skill Representation
 		Accuracy is represented by already implemented random bullet deviation
@@ -62,3 +62,20 @@ Quest System
 		Defend Point (see above: not boring or overly time-consuming, maybe think of cool Mechanics?)
 		Attack Point
 		Build Base (also needs some cool Mechanics to be fun a.k.a. actually a Reason to build a good Base)
+
+Notes from Mac:
+
+Singleplayer/Coop PvE Vietnam-War RPG
+Skilltree inspired by Path of Exile, Level up after returning to base
+Special Equipment Item: Bubble Gum, can have various effects: more accuracy, "bubble gum of the lucky bastard" (better thresholds on healthsystem)
+Random generated Sectors with random Missions
+after finishing or cancelling all missions of the sector can go to a neighbour sector on map or return to base
+Map consists of different sectors
+sectory types (different difficulty): patrol area (jungle), occupied village, FOB, Main Base
+Can set up camp to heal, refill mags, clean weapons, etc.
+Healthsystem hitbased, inspired by Running with rifles: 4 Thresholds: Nothing happens, Bleeding (Effect?), Down (only Coop-relevant), Death
+chances worsen with every hit
+random stats for guns
+Enemies and frindlies guns are crap
+good friendly guns from base trader
+good enemy guns from bosses and weapon crates
