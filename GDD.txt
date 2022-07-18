@@ -79,3 +79,36 @@ random stats for guns
 Enemies and frindlies guns are crap
 good friendly guns from base trader
 good enemy guns from bosses and weapon crates
+
+Notes from Win:
+
+-Head Rotation Array instead of GameObject to allow Arms and Weapons to rotate with Head without being Children
+-Do other Animations in the same Style as Stand/Walk
+-Simple Reload Animation
+-Check Plant Free Space before Spawning with Collider.bounds and Physics.OverlapBox (Spawn Plant, generate rand rotation, Check overlap Box, rotate or delete Plant)
+-Make Settings and BalanceSettings JSONs
+-Separate Host and Client NetworkControllers (as children of base NetworkController)
+-Sync all NetworkRigidbodies every few Seconds for Safety Reasons
+-Validate Transmission of all Network Objects at least once (but beware of NetworkBuffers overflowing)
+-Muzzle Flash Particles
+-Hit Effect Particles for dry dirt, wet dirt, Stone, Wood and Blood
+-Paint Particles into the world permanently (how?)
+-Accuracy Modifier for Bullets
+-5.56 Bullet > M193: 3.56g
+-Damage 5.56 lower than 7.62
+-MuzzleEnergyModifier > MaxBarrelLength + EnergyAtMaxLength, Wurzelfunktion um bei niedrigeren BarrelLengths zu interpolieren, Funktion an MaxLength spiegeln um höhere BarrelLengths zu interpolieren
+-M16 Accuracy to 2m/100m
+-AK Accuracy to 3m/100m
+-Bullet Damage to Float
+-Move Shooting Calculation from Update to fixed Update to enabvle up to 3000 RPM under 0.02 Timestep
+-Weapon Recoil around Weapon Pivot and move Arm Pivot accordingly
+-Wounds: red Voxels at Position of the hit Model Voxel, are Parents of a Bleeding Particle Effect
+-Blood Splatters at Entry and Exit Wounds
+-Penetration
+	(Collider.Raycast(), RaycastAll(),
+	Priorities (which PenetrationResistance/Hardness applies, if 2 Colliders are crossed simultanously),
+	default Priority by Hardness, bool to switch default,
+	Hardness for Hittables, AP-Attribute for Ammo,
+	Penetration Distance and surplus Velocity Calculation)
+-Foldable Stock (bool foldable, Weapon Handling Stat with Movement Speed Effect, Handling Bonus for Folded Stock, Accuracy Bonus for extended Stock)
+-Iron Sights++
